@@ -1,0 +1,39 @@
+# 🗄️ 1. Configuración para MySQL (Datos Estructurados del Dominio)
+# Se usa un prefijo personalizado para que nuestra clase de configuración manual lo lea sin conflictos
+spring:
+  datasource:
+    mysql:
+      url: jdbc:mysql://localhost:3306/devopsmind_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: devopsuser
+      password: devopspassword
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+  # 🍃 2. Configuración para MongoDB (Memoria de Chat)
+  # El Starter de Spring AI MongoDB Chat Memory leerá este bloque de forma nativa
+  data:
+    mongodb:
+      uri: mongodb://mongoroot:mongopassword@localhost:27017/chat_memory_db?authSource=admin
+
+  # 📡 3. Configuración del Servidor GraphQL para Pruebas
+  graphql:
+    graphiql:
+      enabled: true # Habilita la consola interactiva en http://localhost:8080/graphiql
+
+  # 📐 4. Configuración de Inteligencia Artificial (Spring AI)
+  ai:
+    # Repositorio de Vectores con PostgreSQL + pgvector (RAG)
+    vectorstore:
+      pgvector:
+        url: jdbc:postgresql://localhost:5432/labmetricsia_vector_db
+        username: vectoruser
+        password: vectorpassword
+        index-type: HNSW # Índice rápido basado en grafos para tu Ryzen 7
+        initialize-schema: true
+
+    # Motor de Lenguaje Local con Ollama
+    ollama:
+      base-url: http://localhost:11434 # Apunta al servicio Ollama de tu Ubuntu Host
+      chat:
+        options:
+          model: llama3.2:1b # Modelo ligero ideal para validar la lógica y cuidar la VRAM
+          temperature: 0.7

@@ -1,0 +1,129 @@
+{
+	"name": "🍃 LabMetricsIA :: Host TeleMetry Backend 🍃",
+	"service": "hosttelemetry",
+	"dockerComposeFile": "./containers/compose.yaml",  	
+  	"hostRequirements": {
+		"cpus": 2,
+		"memory": "6gb",
+		"storage": "5gb",
+		"gpu": false
+	},
+	"features": {
+		"ghcr.io/devcontainers/features/common-utils:2": {
+			"installZsh": true,
+			"configureZshAsDefaultShell": true,
+			"installOhMyZsh": true,
+			"installOhMyZshConfig": true,
+			"upgradePackages": true,
+			"configureGpgWithGpgAgent": true
+		},
+		"ghcr.io/devcontainers-extra/features/zsh-plugins:0": {
+			"plugins": "zsh-autosuggestions zsh-syntax-highlighting",
+			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions.git https://github.com/zsh-users/zsh-syntax-highlighting.git"
+		},
+		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+			"moby": "false"
+		}
+	},
+    "customizations": {
+		"projectMetadata": {
+			"author": "@DevSoft Team",
+			"repository": "git@github.com:wortiz1027/labmetricsia.git",
+			"version": "1.0.0",
+			"license": "MIT",
+			"environment": "Development"
+		},
+		"vscode": {
+			"extensions": [
+				"esbenp.prettier-vscode",
+				"esbenp.prettier-vscode",
+				"EditorConfig.EditorConfig",
+				"GraphQL.vscode-graphql",
+				"redhat.vscode-yaml",
+				"vscjava.vscode-java-pack",
+				"vmware.vscode-boot-dev-pack",
+				"GraphQL.vscode-graphql-syntax",
+				"GitHub.github-vscode-theme",
+				"zhuangtongfa.material-theme",
+				"Semgrep.semgrep",
+				"CucumberOpen.cucumber-official"
+			],
+			"settings": {
+                "workbench.iconTheme": "symbols",
+                "workbench.colorTheme": "Quiet Light",
+                "git.blame.editorDecoration.enabled": true,
+                "git.blame.statusBarItem.enabled": true,
+                "scm.experimental.showHistoryGraph": true,
+                "editor.renderLineHighlight": "none",
+                "editor.cursorSmoothCaretAnimation": "off",
+                "workbench.colorCustomizations": {
+                    "git.blame.editorDecorationForeground": "#c7c7c788"
+                },
+                "editor.formatOnSave": true,
+                "editor.codeActionsOnSave": {
+                    "source.organizeImports": "explicit"
+                },
+                "dev.containers.forwardWayland": false,
+                "terminal.integrated.defaultProfile.linux": "zsh",
+                "git.autocrlf": "input",
+                "editor.insertSpaces": true,
+                "editor.tabSize": 4,
+                "editor.renderIndentGuides": true,
+                "java.compile.nullAnalysis.mode": "automatic",
+                "java.jdt.ls.java.home": "/home/vscode/.local/share/mise/installs/java/latest",
+                "sonarlint.ls.javaHome": "/home/vscode/.local/share/mise/installs/java/latest",
+                "java.configuration.runtimes": [
+                    {
+                    "name": "JavaSE-25",
+                    "path": "/home/vscode/.local/share/mise/installs/java/latest",
+                    "default": true
+                    }
+                ],
+                "spring-boot.livereload.enabled": true,
+                "files.associations": {
+                    "*.feature": "cucumber"
+                },
+                "cucumber.features": [
+                    "src/test/resources/**/*.feature",
+                    "features/**/*.feature"
+                ],
+                "cucumber.glue": [
+                    "src/test/**/*.js",
+                    "features/step_definitions/**/*.ts"
+                ]
+            }
+        }
+	},
+	"forwardPorts": [
+		8080
+	],
+	"portsAttributes": {
+		"8080": { "label": "Servidor Web Java Backend", "onAutoForward": "notify" }
+	},
+	"mounts": [
+		"source=${localEnv:HOME}/.local/share/gopass,target=${containerWorkspaceFolder}/../.local/share/gopass,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.config/gopass,target=/home/vscode/.config/gopass,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.dotfiles/git/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.dotfiles/git/commit.template,target=/home/vscode/.config/git/commit.template,type=bind,consistency=cached",
+		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly,consistency=cached"
+	],
+	"runArgs": [
+		"--security-opt",
+		"label=disable",
+		"--network=ntw_ai",
+		"--env-file",
+		"${localWorkspaceFolder}/.devcontainer/containers/.env"
+	],
+	"remoteEnv": {
+		"MISE_TRUSTED_CONFIG_PATHS": "/workspaces",
+		"JAVA_HOME": "/home/vscode/.local/share/mise/installs/java/latest",
+		"GOPASS_HOMEDIR": "${containerWorkspaceFolder}/../",
+		"GOPASS_STORE_DIR": "${containerWorkspaceFolder}/../.local/share/gopass/stores/root",
+		"GIT_SAFE_DIRECTORIES": "/workspaces"
+	},
+	"workspaceFolder": "/workspaces",
+	 "updateContentCommand": "chmod +x ./.devcontainer/devopsmind/scripts/boostrap.sh && sh ./.devcontainer/devopsmind/scripts/boostrap.sh && chmod +x ./.devcontainer/devopsmind/scripts/init-workspace.sh && sh ./.devcontainer/devopsmind/scripts/init-workspace.sh",
+	"containerUser": "vscode",
+	"remoteUser": "vscode"
+
+}

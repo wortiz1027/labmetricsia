@@ -1,0 +1,152 @@
+services:
+  devopsmind:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu26.04
+    volumes:
+      - ../../..:/workspaces:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    network_mode: service:mysql
+    environment:
+      - TZ=America/Bogota
+    depends_on:
+      mysql:
+        condition: service_healthy
+      postgres-pgvector:
+        condition: service_healthy
+      mongo:
+        condition: service_healthy
+
+  mysql:
+    image: mysql:9.7.2
+    container_name: srv-mysql
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${DB_MYSQL_DATABASE_NAME}
+      MYSQL_USER: ${DB_MYSQL_USERNAME}
+      MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD}
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - ntw_ai
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${DB_MYSQL_USERNAME}", "-p${DB_MYSQL_PASSWORD}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: srv-ui-phpmyadmin
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      PMA_HOST: srv-mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_MYSQL_ROOT_PASSWORD}
+    ports:
+      - "8081:80"
+    networks:
+      - ntw_ai
+    depends_on:
+      mysql:
+        condition: service_healthy
+
+  postgres-pgvector:
+    image: pgvector/pgvector:pg18
+    container_name: srv-postgres
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      POSTGRES_DB: ${DB_POSTGRES_VECTOR_NAME}
+      POSTGRES_USER: ${DB_POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${DB_POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/18/data
+    networks:
+      - ntw_ai
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_POSTGRES_USERNAME} -d ${DB_POSTGRES_VECTOR_NAME}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: srv-ui-pgadmin
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      PGADMIN_DEFAULT_EMAIL: ${DB_PGADMIN_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${DB_PGADMIN_PASSWORD}
+      PGADMIN_DISABLE_POSTGRES_USER_DETECTION: "true"
+    ports:
+      - "8082:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    networks:
+      - ntw_ai
+    depends_on:
+      postgres-pgvector:
+        condition: service_healthy
+
+  mongo:
+    image: mongo:8.3.11
+    container_name: srv-mongo
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      MONGO_INITDB_ROOT_USERNAME: ${DB_MONGO_ROOT_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${DB_MONGO_ROOT_PASSWORD}
+      MONGO_INITDB_DATABASE: ${DB_MONGO_INITIAL_DB}
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - ntw_ai
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  mongo-express:
+    image: mongo-express:latest
+    container_name: srv-ui-mongo-express
+    restart: unless-stopped
+    environment:
+      TZ: America/Bogota
+      ME_CONFIG_MONGODB_ENABLE_ADMIN: "true"
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ${DB_MONGOEX_ADMIN_USERNAME}
+      ME_CONFIG_MONGODB_ADMINPASSWORD: ${DB_MONGOEX_ADMIN_PASSWROD}
+      ME_CONFIG_MONGODB_SERVER: srv-mongo
+      ME_CONFIG_MONGODB_PORT: 27017
+    ports:
+      - "8083:8081"
+    networks:
+      - ntw_ai
+    depends_on:
+      mongo:
+        condition: service_healthy
+
+volumes:
+  mysql_data:
+    driver: local
+  postgres_data:
+    driver: local
+  pgadmin_data:
+    driver: local
+  mongo_data:
+    driver: local
+
+networks:
+  ntw_ai:
+    external: true

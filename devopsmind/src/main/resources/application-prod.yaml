@@ -1,0 +1,31 @@
+spring:
+  datasource:
+    mysql:
+      url: ${MYSQL_PROD_URL}
+      username: ${MYSQL_PROD_USER}
+      password: ${MYSQL_PROD_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+
+  data:
+    mongodb:
+      uri: ${MONGO_PROD_URI}
+
+  graphql:
+    graphiql:
+      enabled: false # Deshabilitado en producción por motivos de seguridad
+
+  ai:
+    vectorstore:
+      pgvector:
+        url: ${POSTGRES_PROD_URL}
+        username: ${POSTGRES_PROD_USER}
+        password: ${POSTGRES_PROD_PASSWORD}
+        index-type: HNSW
+        initialize-schema: false # En producción los esquemas los debe manejar una herramienta de migración como Liquibase o Flyway
+
+    ollama:
+      base-url: ${OLLAMA_PROD_URL}
+      chat:
+        options:
+          model: ${OLLAMA_PROD_MODEL:llama3.2:3b} # Podrías subir a un modelo más grande si la producción lo requiere
+          temperature: 0.5

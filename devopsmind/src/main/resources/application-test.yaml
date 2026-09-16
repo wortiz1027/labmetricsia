@@ -1,0 +1,15 @@
+spring:
+  # En pruebas, Testcontainers inyectará dinámicamente las URLs reales mediante sus controladores JDBC especializados
+  datasource:
+    mysql:
+      driver-class-name: org.testcontainers.jdbc.ContainerDatabaseDriver
+      url: jdbc:tc:mysql:8.4:///devopsmind_db # El prefijo 'jdbc:tc:' activa Testcontainers de forma automática
+
+  data:
+    mongodb:
+      auto-index-creation: true
+
+  ai:
+    vectorstore:
+      pgvector:
+        initialize-schema: true

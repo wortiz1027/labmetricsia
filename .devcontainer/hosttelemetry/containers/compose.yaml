@@ -1,0 +1,15 @@
+services:
+  hosttelemetry:
+    image: mcr.microsoft.com/devcontainers/base:ubuntu26.04
+    volumes:
+      - ../../..:/workspaces:cached
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: sleep infinity
+    networks:
+      - ntw_ai
+    environment:
+      - TZ=America/Bogota
+
+networks:
+  ntw_ai:
+    external: true

@@ -1,0 +1,50 @@
+[tools]
+# Herramientas globales de automatización, linters y escáneres de seguridad
+uv = "0.11.30"
+gitleaks = "8.30.1"
+trufflehog = "3.95.9"
+miniserve = "0.35.0"
+taplo = "0.10.0"
+trivy = "0.72.0"
+semgrep = "1.170.0"
+
+[tasks]
+# Gestión de Git (Ahora se ejecuta correctamente desde la raíz)
+"git:init" = { run = "mise generate git-pre-commit --write --task=lint" }
+"git:tag-patch" = { run = "./scripts/git-tagger.sh patch" }
+"git:tag-custom" = { run = "./scripts/git-tagger.sh custom" }
+
+# Formateadores y Linters del Repositorio
+"lint:whitespace" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec sed -i 's/[[:space:]]*$//' {} +" }
+"lint:eof" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec awk 'NF {last=$0} END {if (last !~ /\\n$/) print \"\"}' {} +" }
+"lint:json" = { run = "find . -name '*.json' ! -path '*/.*' -exec jq --indent 2 '.' {} \\;" }
+"lint:yaml" = { run = "find . -name '*.yaml' -o -name '*.yml' ! -path '*/.*' -exec grep -q '^' {} \\;" }
+# "lint:toml" = { run = "taplo fmt --check" }
+# "lint:commit-message" = { run = "./scripts/validate-commit.sh" }
+
+# Auditoría de Seguridad (Hardening)
+"security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
+"security:secrets" = { run = "gitleaks protect --staged --verbose" }
+#"security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
+#"security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
+#"security:sast" = { run = "./scripts/check-sast.sh" }
+
+# Servidores Web para Documentación y Reportes del Monorrepo
+"docs:serve-docs" = { run = "miniserve ./docs --index index.html -p 3001" }
+"docs:serve-report-sast" = { run = "miniserve ./devopsmind/build/reports/sast --index index.html -p 3002" }
+"docs:serve-report-jacoco" = { run = "miniserve ./devopsmind/build/reports/jacoco --index index.html -p 3006" }
+
+# Tarea de Orquestación Principal (Llamará a checkstyle en el subdirectorio si existe)
+"lint" = { depends = [
+    "lint:whitespace",
+    "lint:eof",
+    "lint:json",
+    "lint:yaml",
+    # "lint:toml",
+    # "lint:commit-message",
+    "security:private-keys",
+    "security:secrets",
+    #"security:trufflehog",
+    #"security:trufflehog-gh",
+    #"security:sast"
+] }

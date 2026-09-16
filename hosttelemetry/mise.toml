@@ -1,0 +1,74 @@
+[tools]
+java = "oracle-25.0.3"
+maven = "3.9.16"
+uv = "0.11.30"
+gitleaks = "8.30.1"
+trufflehog = "3.95.9"
+miniserve = "0.35.0"
+taplo = "0.10.0"
+trivy = "0.72.0"
+k6 = "2.1.0"
+semgrep = "1.170.0"
+
+[tool_alias.java.versions]
+oracle = "oracle-25.0.3"
+temurin = "temurin-25.0.3+9.0.LTS"
+
+[tool_alias.maven.versions]
+latest = "3.9.14"
+
+[env]
+_.path = [
+    "/home/vscode/.local/share/mise/installs/java/latest/bin:/home/vscode/.local/share/mise/installs/maven/latest/bin",
+]
+JAVA_HOME = "/home/vscode/.local/share/mise/installs/java/latest"
+M2_HOME = "/home/vscode/.local/share/mise/installs/maven/latest"
+
+[tasks]
+"git:init" = { run = "mise generate git-pre-commit --write --task=lint" }
+"git:tag-patch" = { run = "./scripts/git-tagger.sh patch" }
+"git:tag-custom" = { run = "./scripts/git-tagger.sh custom" }
+
+"application:build" = { run = "./scripts/build-image.sh" }
+
+"lint:whitespace" = { run = "find src/ .devcontainer/ . -maxdepth 1 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' \\) -type f -exec sed -i 's/[[:space:]]*$//' {} +" }
+"lint:eof" = { run = "find src/ .devcontainer/ . -maxdepth 1 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' \\) -type f -exec awk 'NF {last=$0} END {if (last !~ /\\n$/) print \"\"}' {} +" }
+"lint:json" = { run = "find . -name '*.json' ! -path '*/.*' -exec jq --indent 2 '.' {} \\;" }
+"lint:yaml" = { run = "find . -name '*.yaml' -o -name '*.yml' -exec grep -q '^' {} \\;" }
+"lint:toml" = { run = "taplo fmt --check" }
+"lint:commit-message" = { run = "./scripts/validate-commit.sh" }
+"lint:checkstyle" = { run = "./gradlew checkstyleMain" }
+"security:scan-image" = { run = "./scripts/scan-image.sh" }
+"security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
+"security:secrets" = { run = "gitleaks protect --staged --verbose" }
+"security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
+"security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
+"security:dependencies" = { run = "./scripts/check-dependencies.sh" }
+"security:sast" = { run = "./scripts/check-sast.sh" }
+"docs:serve-docs" = { run = "miniserve ./docs --index index.html -p 3001" }
+"docs:serve-report-sast" = { run = "miniserve ./build/reports/sast --index index.html -p 3002" }
+"docs:serve-checkstyle" = { run = "miniserve ./build/reports/checkstyle --index main.html -p 3003" }
+"docs:serve-dependencies" = { run = "miniserve ./build/reports/dependency-check --index report.html -p 3004" }
+"docs:serve-report-test" = { run = "miniserve ./build/reports/tests/test --index index.html -p 3005" }
+"docs:serve-report-jacoco" = { run = "miniserve ./build/reports/jacoco --index index.html -p 3006" }
+"lint" = { depends = [
+    "lint:whitespace",
+    "lint:eof",
+    "lint:json",
+    "lint:yaml",
+    "lint:toml",
+    "lint:commit-message",
+    "lint:checkstyle",
+    "security:private-keys",
+    "security:secrets",
+    "security:trufflehog",
+    "security:trufflehog-gh",
+    "security:dependencies",
+] }
+
+[hooks]
+postinstall = "../.devcontainer/hosttelemetry/scripts/sync-env.sh"
+
+[[watch_files]]
+patterns = ["mise.toml"]
+run = "../.devcontainer/hosttelemetry/scripts/sync-env.sh"
