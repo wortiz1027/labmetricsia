@@ -146,7 +146,7 @@
 	"workspaceFolder": "/workspaces",
   	"initializeCommand": "./.devcontainer/devopsmind/scripts/sync-secrets.sh",
 	"updateContentCommand": "chmod +x ./.devcontainer/devopsmind/scripts/boostrap.sh && sh ./.devcontainer/devopsmind/scripts/boostrap.sh && chmod +x ./.devcontainer/devopsmind/scripts/init-workspace.sh && sh ./.devcontainer/devopsmind/scripts/init-workspace.sh",
-	"postStartCommand": "rm -f ./.devcontainer/devopsmind/containers/.env",		
+	"postStartCommand": "rm -f ./.devcontainer/devopsmind/containers/.env && sh ./devopsmind/scripts/credetials.sh",		
 	"containerUser": "vscode",
 	"remoteUser": "vscode"
 
