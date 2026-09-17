@@ -137,14 +137,18 @@ services:
       mongo:
         condition: service_healthy
   vault:
-    image: openbao/bao:latest    # O "hashicorp/vault:1.15" si prefieres la imagen tradicional (API idéntica)
+    image: openbao/openbao:latest    # O "hashicorp/vault:1.15" si prefieres la imagen tradicional (API idéntica)
     container_name: srv-secret-manager
     restart: unless-stopped
-    environment:
-      BAO_DEV_ROOT_TOKEN_ID: labmetricsia-root-token # Token fijo de administración para tu laboratorio
-      BAO_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
     ports:
       - "8200:8200" # Puerto nativo de la API y de la interfaz web
+    environment:
+      BAO_DEV_ROOT_TOKEN_ID: labmetricsia-token # Token fijo de administración para tu laboratorio
+      BAO_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
+      VAULT_ADDR: http://srv-secret-manager:8200
+    volumes:
+      - ./openbao/config:/openbao/config
+      - ./openbao/data:/openbao/data
     networks:
       - ntw_ai
     healthcheck:
@@ -153,7 +157,7 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
-      
+
 volumes:
   mysql_data:
     driver: local
