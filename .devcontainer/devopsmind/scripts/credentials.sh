@@ -13,6 +13,7 @@ fi
 echo "🔐 Extract credentials directly from VAULT to memory..."
 
 # Definir las rutas en VAULT
+VAULT_TOKEN_SECRET_MANAGER=$(gopass show -o ai/api/auth/secret-vault-token)
 VAULT_API_OLLAMA_SECRET_KEY=$(gopass show -o ai/api/auth/secret-key)
 VAULT_OLLAMA_SERVER_HOSTNAME=$(gopass show -o ai/api/ollama/hostname)
 VAULT_LLM_MODEL_NAME=$(gopass show -o ai/api/llm/model/name)
@@ -41,6 +42,7 @@ if ! command -v gopass &> /dev/null; then
 fi
 
 # Exportar directamente a las variables de entorno locales
+export TOKEN_SECRET_MANAGER=$(gopass show -o $VAULT_TOKEN_SECRET_MANAGER)
 export API_OLLAMA_SECRET_KEY=$(gopass show -o $VAULT_API_OLLAMA_SECRET_KEY)
 
 export OLLAMA_SERVER_HOSTNAME=$(gopass show -o $VAULT_OLLAMA_SERVER_HOSTNAME)

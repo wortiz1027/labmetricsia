@@ -17,7 +17,7 @@
 		"gpu": false
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2": {
+		"ghcr.io/devcontainers/features/common-utils:2.6.0": {
 			"installZsh": true,
 			"configureZshAsDefaultShell": true,
 			"installOhMyZsh": true,
@@ -29,7 +29,7 @@
 			"plugins": "zsh-autosuggestions zsh-syntax-highlighting",
 			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions.git https://github.com/zsh-users/zsh-syntax-highlighting.git"
 		},
-		"ghcr.io/devcontainers/features/docker-in-docker:2": {
+		"ghcr.io/devcontainers/features/docker-in-docker:4.1.1": {
 			"moby": "false"
 		}
 	},
@@ -110,7 +110,8 @@
 		27017,
 		8081,
 		8082,
-		8083
+		8083,
+		8200
 	],
 	"portsAttributes": {
 		"8080": { "label": "Servidor Web Java Backend", "onAutoForward": "notify" },
@@ -120,33 +121,29 @@
 		"27017": { "label": "Servidor MongoDB", "onAutoForward": "notify" },
 		"8081": { "label": "Servidor PhpMyAdmin", "onAutoForward": "notify" },
 		"8082": { "label": "Servidor PgAdmin", "onAutoForward": "notify" },
-		"8083": { "label": "Servidor Mongo Express", "onAutoForward": "notify" }
+		"8083": { "label": "Servidor Mongo Express", "onAutoForward": "notify" },
+		"8200": { "label": "Servidor Secret Manager", "onAutoForward": "notify" }
 	},
 	"mounts": [
-		"source=${localEnv:HOME}/.local/share/gopass,target=${containerWorkspaceFolder}/../.local/share/gopass,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.config/gopass,target=/home/vscode/.config/gopass,type=bind,consistency=cached",
 		"source=${localEnv:HOME}/.dotfiles/git/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
 		"source=${localEnv:HOME}/.dotfiles/git/commit.template,target=/home/vscode/.config/git/commit.template,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.ssh,target=/home/vscode/.ssh,type=bind,readonly,consistency=cached"
 	],
 	"runArgs": [
 		"--security-opt",
 		"label=disable",
 		"--network=ntw_ai",
-		"--env-file",
-		"${localWorkspaceFolder}/.devcontainer/containers/.env"
+		"--env-file"
 	],
 	"remoteEnv": {
 		"MISE_TRUSTED_CONFIG_PATHS": "/workspaces",
 		"JAVA_HOME": "/home/vscode/.local/share/mise/installs/java/latest",
-		"GOPASS_HOMEDIR": "${containerWorkspaceFolder}/../",
-		"GOPASS_STORE_DIR": "${containerWorkspaceFolder}/../.local/share/gopass/stores/root",
 		"GIT_SAFE_DIRECTORIES": "/workspaces"
 	},
 	"workspaceFolder": "/workspaces",
+	"onCreateCommand": "sudo chmod 666 /var/run/docker.sock || true",
   	"initializeCommand": "./.devcontainer/devopsmind/scripts/sync-secrets.sh",
-	"updateContentCommand": "chmod +x ./.devcontainer/devopsmind/scripts/boostrap.sh && sh ./.devcontainer/devopsmind/scripts/boostrap.sh && chmod +x ./.devcontainer/devopsmind/scripts/init-workspace.sh && sh ./.devcontainer/devopsmind/scripts/init-workspace.sh",
-	"postStartCommand": "rm -f ./.devcontainer/devopsmind/containers/.env && sh ./devopsmind/scripts/credetials.sh",		
+	"updateContentCommand": "chmod +x ./.devcontainer/devopsmind/scripts/boostrap.sh && bash ./.devcontainer/devopsmind/scripts/boostrap.sh && chmod +x ./.devcontainer/devopsmind/scripts/init-workspace.sh && chmod +x ./.devcontainer/devopsmind/scripts/load-env.sh && sh ./.devcontainer/devopsmind/scripts/init-workspace.sh && bash ./.devcontainer/devopsmind/scripts/load-env.sh",
+	"postStartCommand": "rm -f ./.devcontainer/devopsmind/containers/.env",		
 	"containerUser": "vscode",
 	"remoteUser": "vscode"
 
