@@ -17,6 +17,8 @@ services:
         condition: service_healthy
       mongo:
         condition: service_healthy
+      vault:
+        condition: service_healthy
 
   mysql:
     image: mysql:9.7.2
@@ -138,14 +140,15 @@ services:
     depends_on:
       mongo:
         condition: service_healthy
+  
   vault:
-    image: openbao/openbao:latest    # O "hashicorp/vault:1.15" si prefieres la imagen tradicional (API idéntica)
+    image: openbao/openbao:latest
     container_name: srv-secret-manager
     restart: unless-stopped
     ports:
-      - "8200:8200" # Puerto nativo de la API y de la interfaz web
+      - "8200:8200"
     environment:
-      BAO_DEV_ROOT_TOKEN_ID: ${TOKEN_SECRET_MANAGER} # Token fijo de administración para tu laboratorio
+      BAO_DEV_ROOT_TOKEN_ID: ${TOKEN_SECRET_MANAGER}
       BAO_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
       VAULT_ADDR: http://srv-secret-manager:8200
     volumes:
@@ -154,7 +157,7 @@ services:
     networks:
       - ntw_ai
     healthcheck:
-      test: ["CMD", "bao", "status"] # O "vault status" según la imagen
+      test: ["CMD", "bao", "status"]
       interval: 10s
       timeout: 5s
       retries: 5

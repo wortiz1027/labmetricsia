@@ -23,6 +23,7 @@ export GOPASS_NO_INTERACTIVE=true
 # 🎯 LA MEJORA CLAVE: Usamos 'tee' para redirigir el bloque de texto simultáneamente 
 # hacia la carpeta de tu monorrepo y hacia el directorio /tmp global de tu máquina host.
 cat << EOF | tee .devcontainer/devopsmind/containers/.env /tmp/.env > /dev/null
+SECRET_MANAGER_HOSTNAME=$(gopass show -o ai/api/auth/secret-vault-host || echo "localhost")
 TOKEN_SECRET_MANAGER=$(gopass show -o ai/api/auth/secret-vault-token || echo "default-token-fail")
 API_OLLAMA_SECRET_KEY=$(gopass show -o ai/api/auth/secret-key)
 

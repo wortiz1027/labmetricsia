@@ -12,18 +12,18 @@ semgrep = "1.170.0"
 "git:tag-patch" = { run = "./scripts/git-tagger.sh patch" }
 "git:tag-custom" = { run = "./scripts/git-tagger.sh custom" }
 
-"lint:whitespace" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec sed -i 's/[[:space:]]*$//' {} +" }
-"lint:eof" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec awk 'NF {last=$0} END {if (last !~ /\\n$/) print \"\"}' {} +" }
-"lint:json" = { run = "find . -name '*.json' ! -path '*/.*' -exec jq --indent 2 '.' {} \\;" }
-"lint:yaml" = { run = "find . -name '*.yaml' -o -name '*.yml' ! -path '*/.*' -exec grep -q '^' {} \\;" }
-# "lint:toml" = { run = "taplo fmt --check" }
-# "lint:commit-message" = { run = "./scripts/validate-commit.sh" }
+ "lint:whitespace" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec sed -i 's/[[:space:]]*$//' {} +" }
+ "lint:eof" = { run = "find . -maxdepth 3 \\( -name '*.toml' -o -name '*.xml' -o -name '*.json' -o -name '*.yaml' -o -name '*.yml' \\) -type f ! -path '*/.*' -exec awk 'NF {last=$0} END {if (last !~ /\\n$/) print \"\"}' {} +" }
+ "lint:json" = { run = "find . -name '*.json' ! -path '*/.*' -exec jq --indent 2 '.' {} \\;" }
+ "lint:yaml" = { run = "find . -name '*.yaml' -o -name '*.yml' ! -path '*/.*' -exec grep -q '^' {} \\;" }
+ "lint:toml" = { run = "taplo fmt --check" }
+ "lint:commit-message" = { run = "./scripts/validate-commit.sh" }
 
-"security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
-"security:secrets" = { run = "gitleaks protect --staged --verbose" }
-#"security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
-#"security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
-#"security:sast" = { run = "./scripts/check-sast.sh" }
+# "security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
+# "security:secrets" = { run = "gitleaks protect --staged --verbose" }
+# "security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
+# "security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
+# "security:sast" = { run = "./scripts/check-sast.sh" }
 
 "lint" = { depends = [
     "lint:whitespace",

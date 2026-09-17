@@ -71,7 +71,11 @@
     <!-- PERFIL DE DESARROLLO / LOCAL (Tu máquina física)                        -->
     <!-- ======================================================================= -->
     <springProfile name="!prod">
-         <logger name="co.com.netec.devopsmind" level="INFO" additivity="false">
+        <logger name="co.com.netec.devopsmind" level="INFO" additivity="false">
+            <appender-ref ref="CONSOLE" />
+        </logger>
+
+        <logger name="org.springframework.cloud.vault" level="DEBUG" additivity="false">
             <appender-ref ref="CONSOLE" />
         </logger>
 
