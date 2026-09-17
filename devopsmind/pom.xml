@@ -11,145 +11,183 @@
 	<groupId>co.com.devsoft</groupId>
 	<artifactId>devopsmind</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name/>
-	<description/>
-	<url/>
-	<licenses>
-		<license/>
-	</licenses>
-	<developers>
-		<developer/>
-	</developers>
-	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
-	</scm>
+	<name>labmetricsia</name>
+	<description>Aplicación para testear conexión en un contexto de uso de modelos LLMs</description>
+  <url>https://developer.io/</url>
+	<organization>
+      <name>developer.io</name>
+      <url>https://developer.io/</url>
+  </organization>
+
+  <developers>
+      <developer>
+          <id>wortiz</id>
+          <name>Wilman Ortiz</name>
+          <email>wilman.ortiz@gmail.com</email>
+          <url>https://developer.io/</url>
+          <organization>developer.io</organization>
+          <organizationUrl>https://developer.io/</organizationUrl>
+          <roles>
+              <role>Desarrollador Senior</role>
+          </roles>
+          <timezone>America/Bogota</timezone>
+          <properties>
+              <picture>https://www.todacolombia.com/imagenes/informacion-colombia/Bandera_de_Colombia_Flag_of_Colombia.png</picture>
+          </properties>
+      </developer>
+  </developers>
+
+  <scm>
+      <url>https://github.com/wortiz1027/labmetricsia</url>
+      <connection>git@github.com:wortiz1027/labmetricsia.git</connection>
+      <developerConnection>git@github.com:wortiz1027/labmetricsia.git</developerConnection>
+      <tag>main</tag>
+  </scm>
+
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<properties>
+				<spring.profiles.active>dev</spring.profiles.active>
+			</properties>
+		</profile>
+
+		<profile>
+			<id>prod</id>
+			<properties>
+				<spring.profiles.active>prod</spring.profiles.active>
+			</properties>
+		</profile>
+	</profiles>
+
 	<properties>
-		<java.version>25</java.version>
-		<spring-ai.version>2.0.1</spring-ai.version>
-		<archunit.version>1.5.0</archunit.version>
+      <java.version>25</java.version>
+      <spring-ai.version>2.0.1</spring-ai.version>
+      <archunit.version>1.5.0</archunit.version>
 	</properties>
+
 	<dependencies>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-mongodb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-graphql</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-graphql</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc</artifactId>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webmvc</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-chat-memory-repository-mongodb</artifactId>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-chat-memory-repository-mongodb</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-model-ollama</artifactId>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-model-ollama</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-starter-vector-store-pgvector</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-vector-store-advisor</artifactId>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-vector-store-advisor</artifactId>
 		</dependency>
 
 		<dependency>
-			<groupId>com.mysql</groupId>
-			<artifactId>mysql-connector-j</artifactId>
-			<scope>runtime</scope>
+        <groupId>com.mysql</groupId>
+        <artifactId>mysql-connector-j</artifactId>
+        <scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.postgresql</groupId>
-			<artifactId>postgresql</artifactId>
-			<scope>runtime</scope>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <scope>runtime</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<optional>true</optional>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <optional>true</optional>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator-test</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-actuator-test</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-jpa-test</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-data-mongodb-test</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-data-mongodb-test</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-graphql-test</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-graphql-test</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-webmvc-test</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-webmvc-test</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-testcontainers</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-testcontainers</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.springframework.ai</groupId>
-			<artifactId>spring-ai-spring-boot-testcontainers</artifactId>
-			<scope>test</scope>
+        <groupId>org.springframework.ai</groupId>
+        <artifactId>spring-ai-spring-boot-testcontainers</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-junit-jupiter</artifactId>
-			<scope>test</scope>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-junit-jupiter</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-mongodb</artifactId>
-			<scope>test</scope>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-mongodb</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-mysql</artifactId>
-			<scope>test</scope>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-mysql</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-ollama</artifactId>
-			<scope>test</scope>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-ollama</artifactId>
+        <scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>org.testcontainers</groupId>
-			<artifactId>testcontainers-postgresql</artifactId>
-			<scope>test</scope>
+        <groupId>org.testcontainers</groupId>
+        <artifactId>testcontainers-postgresql</artifactId>
+        <scope>test</scope>
 		</dependency>
     <dependency>
-      <groupId>com.tngtech.archunit</groupId>
-      <artifactId>archunit-junit5</artifactId>
-      <version>${archunit.version}</version>
-      <scope>test</scope>
-  </dependency>
+        <groupId>com.tngtech.archunit</groupId>
+        <artifactId>archunit-junit5</artifactId>
+        <version>${archunit.version}</version>
+        <scope>test</scope>
+    </dependency>
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -205,6 +243,65 @@
 					</execution>
 				</executions>
 			</plugin>
+      <plugin>
+          <groupId>org.jacoco</groupId>
+          <artifactId>jacoco-maven-plugin</artifactId>
+          <version>0.8.11</version>
+          <executions>
+            <execution>
+              <id>prepare-agent</id>
+              <goals>
+                <goal>prepare-agent</goal>
+              </goals>
+            </execution>
+            <execution>
+              <id>report</id>
+              <phase>verify</phase>
+              <goals>
+                <goal>report</goal>
+              </goals>
+              <configuration>
+                <excludes>
+                  <exclude>co/com/netec/devsoft/dto/**</exclude>
+                  <exclude>co/com/netec/devsoft/entity/**</exclude>
+                  <exclude>co/com/netec/devsoft/exception/**</exclude>
+                  <exclude>co/com/netec/devsoft/Application.class</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+            <execution>
+              <id>check-coverage</id>
+              <goals>
+                <goal>check</goal>
+              </goals>
+              <configuration>
+                <rules>
+                  <rule>
+                    <element>BUNDLE</element>
+                    <limits>
+                      <limit>
+                        <counter>LINE</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>0.55</minimum>
+                      </limit>
+                      <limit>
+                        <counter>BRANCH</counter>
+                        <value>COVEREDRATIO</value>
+                        <minimum>0.55</minimum>
+                      </limit>
+                    </limits>
+                  </rule>
+                </rules>
+                <excludes>
+                  <exclude>co/com/netec/devsoft/dto/**</exclude>
+                  <exclude>co/com/netec/devsoft/entity/**</exclude>
+                  <exclude>co/com/netec/devsoft/exception/**</exclude>
+                  <exclude>co/com/netec/devsoft/Application.class</exclude>
+                </excludes>
+              </configuration>
+            </execution>
+          </executions>
+      </plugin>
 		</plugins>
 	</build>
 
