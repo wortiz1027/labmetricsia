@@ -1,39 +1,43 @@
-# --- Carpetas de Compilación e Inicialización (Gradle) ---
-.gradle/
-build/
-bin/
-out/
-scripts/
-docs/
+# =========================================================================
+# 🚫 WORKSPACE DOCKER IGNORE FILE
+# Evita enviar archivos basura o locales al contexto de compilación de Docker
+# =========================================================================
 
-# --- Reportes y Archivos Temporales ---
-.gradle-tasks-logs/
-*.log
-*.tmp
+# ☕ Compilados Locales y Artefactos de Java
+**/target/
+**/build/
+**/*.jar
+**/*.war
+**/*.class
 
-# --- Configuraciones de Entorno y Extensiones de Contenedor ---
+# 🔧 Entornos de Desarrollo Especializados (IDEs & DevContainers)
 .devcontainer/
-.dockerignore
-Dockerfile
-docker-compose*.yml
-mise.toml
-.mise/
-
-# --- Configuraciones del IDE y Editores ---
 .vscode/
 .idea/
 *.iml
 *.ipr
 *.iws
-.settings/
 .classpath
 .project
-.factorypath
+.settings/
+.nbproject/
 
-# --- Sistema Operativo ---
+# 🔐 Credenciales y Configuración de Secretos (¡Seguridad Crítica!)
+.env
+.env.example
+**/*.log
+**/logs/
+
+# 📦 Suites de Pruebas Cruzadas e Históricos de Calidad
+**/*.http
+**/target/site/jacoco/
+.jacoco/
+.gradle/
+
+# 🗺️ Sistema Operativo y Control de Versiones
+.git/
+.gitignore
+.gitattributes
+*.md
 .DS_Store
 Thumbs.db
-
-# --- Control de Versiones (Opcional, desmarcar si necesitas Git en el build) ---
-.git
-.gitignore
