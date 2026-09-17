@@ -19,8 +19,8 @@ semgrep = "1.170.0"
  "lint:toml" = { run = "taplo fmt --check" }
  "lint:commit-message" = { run = "./scripts/validate-commit.sh" }
 
-# "security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
-# "security:secrets" = { run = "gitleaks protect --staged --verbose" }
+"security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
+"security:secrets" = { run = "gitleaks protect --staged --verbose" }
 # "security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
 # "security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
 # "security:sast" = { run = "./scripts/check-sast.sh" }
