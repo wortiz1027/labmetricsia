@@ -1,31 +1,49 @@
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: validate
   datasource:
-    mysql:
-      url: ${MYSQL_PROD_URL}
-      username: ${MYSQL_PROD_USER}
-      password: ${MYSQL_PROD_PASSWORD}
-      driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_MYSQL_HOSTNAME:localhost}:3306/${DB_MYSQL_DATABASE_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_MYSQL_USERNAME}
+    password: ${DB_MYSQL_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      pool-name: devops-dev-hikari-pool
+      minimum-idle: 2
+      maximum-pool-size: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+    postgres:
+      url: jdbc:postgresql://${DB_POSTGRES_HOSTNAME}:5432/${DB_POSTGRES_VECTOR_NAME:labmetricsia_vector_db}
+      username: ${DB_POSTGRES_USERNAME}
+      password: ${DB_POSTGRES_PASSWORD}
+      hikari:
+        pool-name: devops-dev-hikari-pool
+        minimum-idle: 2
+        maximum-pool-size: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
 
-  data:
-    mongodb:
-      uri: ${MONGO_PROD_URI}
+  mongodb:
+    uri: mongodb://${DB_MONGO_ROOT_USERNAME}:${DB_MONGO_ROOT_PASSWORD}@${DB_MONGO_HOSTNAME}:27017/${DB_MONGO_INITIAL_DB:chat_memory_db}?authSource=admin
 
   graphql:
     graphiql:
-      enabled: false # Deshabilitado en producción por motivos de seguridad
+      enabled: false
 
   ai:
     vectorstore:
       pgvector:
-        url: ${POSTGRES_PROD_URL}
-        username: ${POSTGRES_PROD_USER}
-        password: ${POSTGRES_PROD_PASSWORD}
+        initialize-schema: true
         index-type: HNSW
-        initialize-schema: false # En producción los esquemas los debe manejar una herramienta de migración como Liquibase o Flyway
+        distance-type: COSINE_DISTANCE
+        dimensions: 1536
 
     ollama:
-      base-url: ${OLLAMA_PROD_URL}
+      base-url: http://${OLLAMA_SERVER_HOSTNAME:localhost}:11434
       chat:
-        options:
-          model: ${OLLAMA_PROD_MODEL:llama3.2:3b} # Podrías subir a un modelo más grande si la producción lo requiere
-          temperature: 0.5
+        model: ${LLM_MODEL_NAME:llama3.2:1b}
+        temperature: 0.7
+
