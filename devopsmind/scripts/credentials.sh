@@ -14,6 +14,8 @@ echo "🔐 Extract credentials directly from VAULT to memory..."
 
 # Definir las rutas en VAULT
 VAULT_API_OLLAMA_SECRET_KEY=$(gopass show -o ai/api/auth/secret-key)
+VAULT_OLLAMA_SERVER_HOSTNAME=$(gopass show -o ai/api/ollama/hostname)
+VAULT_LLM_MODEL_NAME=$(gopass show -o ai/api/llm/model/name)
 VAULT_DB_MYSQL_ROOT_PASSWORD=$(gopass show -o ai/database/mysql/password)
 VAULT_DB_MYSQL_USERNAME=$(gopass show -o ai/database/mysql/username)
 VAULT_DB_MYSQL_PASSWORD=$(gopass show -o ai/database/mysql/password)
@@ -40,6 +42,10 @@ fi
 
 # Exportar directamente a las variables de entorno locales
 export API_OLLAMA_SECRET_KEY=$(gopass show -o $VAULT_API_OLLAMA_SECRET_KEY)
+
+export OLLAMA_SERVER_HOSTNAME=$(gopass show -o $VAULT_OLLAMA_SERVER_HOSTNAME)
+export LLM_MODEL_NAME=$(gopass show -o $VAULT_LLM_MODEL_NAME)
+
 export DB_MYSQL_ROOT_PASSWORD=$(gopass show -o $VAULT_DB_MYSQL_ROOT_PASSWORD)
 export DB_MYSQL_USERNAME=$(gopass show -o $VAULT_DB_MYSQL_USERNAME)
 export DB_MYSQL_PASSWORD=$(gopass show -o $VAULT_DB_MYSQL_PASSWORD)
