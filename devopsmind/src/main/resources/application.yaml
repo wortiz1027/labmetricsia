@@ -3,3 +3,5 @@ spring:
     name: devopsmind
   profiles:
     active: dev # Si no se especifica un perfil al arrancar, usará este
+  flyway:
+    enabled: false

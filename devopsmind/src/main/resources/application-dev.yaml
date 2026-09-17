@@ -1,19 +1,38 @@
 spring:
+  cloud:
+    vault:
+      uri: http://${SECRET_MANAGER_HOSTNAME:srv-secret-manage}:8200
+      authentication: TOKEN
+      token: ${TOKEN_SECRET_MANAGER}
+      kv:
+        enabled: true
+        backend: secret
+        default-context: "kv/devopsmind"
+        profile-separator: '/'
+      fail-fast: true
+      connection-timeout: 5000
+      read-timeout: 15000
+  config:
+    import: vault://
   jpa:
     hibernate:
       ddl-auto: validate
-  datasource:
-    url: jdbc:mysql://${DB_MYSQL_HOSTNAME:localhost}:3306/${DB_MYSQL_DATABASE_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-    username: ${DB_MYSQL_USERNAME}
-    password: ${DB_MYSQL_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      pool-name: devops-dev-hikari-pool
-      minimum-idle: 2
-      maximum-pool-size: 5
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+  app-datasource:
+    mysql:
+      url: jdbc:mysql://${DB_MYSQL_HOSTNAME:localhost}:3306/${DB_MYSQL_DATABASE_NAME}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+      username: ${DB_MYSQL_USERNAME}
+      password: ${DB_MYSQL_PASSWORD}
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      hikari:
+        pool-name: devops-dev-hikari-pool
+        minimum-idle: 2
+        maximum-pool-size: 5
+        connection-timeout: 30000
+        idle-timeout: 600000
+        max-lifetime: 1800000
+      flyway:
+        locations: classpath:db/migration/mysql
+        table: schema_version_mysql
     postgres:
       url: jdbc:postgresql://${DB_POSTGRES_HOSTNAME}:5432/${DB_POSTGRES_VECTOR_NAME:labmetricsia_vector_db}
       username: ${DB_POSTGRES_USERNAME}
@@ -25,7 +44,9 @@ spring:
         connection-timeout: 30000
         idle-timeout: 600000
         max-lifetime: 1800000
-
+      flyway:
+        locations: classpath:db/migration/postgres
+        table: schema_version_postgres
   mongodb:
     uri: mongodb://${DB_MONGO_ROOT_USERNAME}:${DB_MONGO_ROOT_PASSWORD}@${DB_MONGO_HOSTNAME}:27017/${DB_MONGO_INITIAL_DB:chat_memory_db}?authSource=admin
 

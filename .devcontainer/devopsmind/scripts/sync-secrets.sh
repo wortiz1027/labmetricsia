@@ -5,7 +5,7 @@
 
 set -e
 
-echo "🔐 Extrayendo secretos de gopass hacia archivo temporal..."
+echo "🔐 Extrayendo secretos de gopass hacia archivos temporales (Monorrepo y /tmp)..."
 
 if ! command -v gopass &> /dev/null; then
     if [ -f "$HOME/.local/bin/gopass" ]; then
@@ -18,7 +18,13 @@ if ! command -v gopass &> /dev/null; then
     fi
 fi
 
-cat << EOF > .devcontainer/devopsmind/containers/.env
+export GOPASS_NO_INTERACTIVE=true
+
+# 🎯 LA MEJORA CLAVE: Usamos 'tee' para redirigir el bloque de texto simultáneamente 
+# hacia la carpeta de tu monorrepo y hacia el directorio /tmp global de tu máquina host.
+cat << EOF | tee .devcontainer/devopsmind/containers/.env /tmp/.env > /dev/null
+SECRET_MANAGER_HOSTNAME=$(gopass show -o ai/api/auth/secret-vault-host || echo "localhost")
+TOKEN_SECRET_MANAGER=$(gopass show -o ai/api/auth/secret-vault-token || echo "default-token-fail")
 API_OLLAMA_SECRET_KEY=$(gopass show -o ai/api/auth/secret-key)
 
 DB_MYSQL_ROOT_PASSWORD=$(gopass show -o ai/database/mysql/password)
@@ -45,4 +51,4 @@ DB_MONGOEX_ADMIN_USERNAME=$(gopass show -o ai/database/mongoex/username)
 DB_MONGOEX_ADMIN_PASSWROD=$(gopass show -o ai/database/mongoex/password)
 EOF
 
-echo "✅ Archivo .devcontainer/.env generado con éxito."
+echo "✅ Archivos de secretos generados con éxito en el monorrepo y en /tmp/.env"

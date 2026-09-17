@@ -17,7 +17,7 @@ JAVA_HOME = "/home/vscode/.local/share/mise/installs/java/latest"
 M2_HOME = "/home/vscode/.local/share/mise/installs/maven/latest"
 
 [tasks]
-"git:init" = { run = "mise generate git-pre-commit --write --task=lint" }
+#"git:init" = { run = "mise generate git-pre-commit --write --task=lint" }
 "git:tag-patch" = { run = "./scripts/git-tagger.sh patch" }
 "git:tag-custom" = { run = "./scripts/git-tagger.sh custom" }
 
