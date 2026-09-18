@@ -67,6 +67,7 @@
       <java.version>25</java.version>
       <spring-ai.version>2.0.1</spring-ai.version>
       <archunit.version>1.5.0</archunit.version>
+      <flyway.version>13.7.0</flyway.version>
       <spring-cloud.version>2025.1.2</spring-cloud.version>
 	</properties>
 
@@ -94,6 +95,7 @@
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+
 		<dependency>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-data-jpa</artifactId>
@@ -162,10 +164,10 @@
         <artifactId>spring-boot-starter-graphql-test</artifactId>
         <scope>test</scope>
 		</dependency>
-    <dependency>
+    <!--dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-flyway</artifactId>
-    </dependency>
+    </dependency-->
 
     <dependency>
         <groupId>org.springframework.cloud</groupId>
@@ -226,6 +228,27 @@
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-flyway-test</artifactId>
       <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+      <version>${flyway.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+      <version>${flyway.version}</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-mysql</artifactId>
+        <version>${flyway.version}</version>
+        <scope>compile</scope>
     </dependency>
 	</dependencies>
 

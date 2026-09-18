@@ -31,7 +31,7 @@ public class DataSourceConfig {
         runFlywayMigration(
             dataSource,
             "classpath:db/migration/mysql",
-                "schema_version_postgres"
+                "schema_version_mysql"
         );
 
         return dataSource;
@@ -62,11 +62,11 @@ public class DataSourceConfig {
 
     private void runFlywayMigration(DataSource dataSource, String location, String table) {
         Flyway flyway = Flyway.configure()
-        .dataSource(dataSource)
-        .locations(location)
-        .table(table)
-        .baselineOnMigrate(Boolean.TRUE)
-        .load();
+                .dataSource(dataSource)
+                .locations(location)
+                .table(table)
+                .baselineOnMigrate(Boolean.TRUE)
+                .load();
 
         flyway.migrate();
     }
