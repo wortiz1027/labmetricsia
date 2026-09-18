@@ -1,0 +1,7 @@
+package co.com.devsoft.devopsmind.infrastructure.adapter.input.graphql.dto;
+
+import java.util.List;
+
+public record TechnicalManualDTO(String id, String title, boolean isDeprecated, List<KnowledgeChunkDTO> chunks) {
+
+}

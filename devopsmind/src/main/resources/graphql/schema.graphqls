@@ -1,0 +1,110 @@
+# ==============================================================================
+# 📚 CONTEXTO DE GESTIÓN DE DOCUMENTACIÓN TÉCNICA (RAG)
+# ==============================================================================
+
+"Representa el metadato estructurado de un manual de ingeniería indexado en MySQL"
+type TechnicalManual {
+    id: ID!
+    title: String!
+    isDeprecated: Boolean!
+    "Relación anidada: Permite al cliente extraer los trozos vectoriales si lo desea"
+    chunks: [KnowledgeChunk!]!
+}
+
+"Representa un fragmento de conocimiento semántico almacenado en PostgreSQL + pgvector"
+type KnowledgeChunk {
+    content: String!
+    sectionName: String!
+    tokenCountEstimate: Int!
+    formatForContext: String!
+}
+
+# ==============================================================================
+# 🚨 CONTEXTO DE OBSERVABILIDAD E INCIDENTES DE INTELIGENCIA ARTIFICIAL
+# ==============================================================================
+
+"Entidad raíz que audita un fallo de infraestructura y su diagnóstico cognitivo"
+type LabIncident {
+    id: ID!
+    errorDescription: String!
+    status: IncidentStatus!
+    severity: IncidentSeverity!
+    "Relación 1 a 1: Métricas de hardware capturadas en caliente en el Ryzen 7"
+    metrics: ServerMetrics!
+    "Relación 1 a 0..1: Plan de acción y mitigación sugerido por el LLM de Ollama"
+    solutionPlan: DiagnosticPlan
+}
+
+"Telemetría inmutable de hardware recolectada en el milisegundo del error"
+type ServerMetrics {
+    cpuUsagePercentage: Float!
+    ramUsageGigabytes: Float!
+    gpuVramUsageGigabytes: Float!
+    isSwapActive: Boolean!
+    hasMemoryAlert: Boolean!
+    requiresCacheFlush: Boolean!
+}
+
+"Plan de mitigación y comandos de consola Unix validados por el escudo del dominio"
+type DiagnosticPlan {
+    analysisConclusion: String!
+    stepsToSolve: [String!]!
+    requiresKernelReboot: Boolean!
+    hasForbiddenCommands: Boolean!
+}
+
+# ==============================================================================
+# 🚥 ENUMERADORES Y TIPOS DE ENTRADA (INPUTS)
+# ==============================================================================
+
+enum IncidentStatus {
+    OPEN
+    ANALYZING
+    RESOLVED
+    FALSE_POSITIVE
+}
+
+enum IncidentSeverity {
+    LOW
+    MEDIUM
+    HIGH
+    CRITICAL
+}
+
+"Contenedor de entrada para capturar la telemetría cruda del servidor"
+input ServerMetricsInput {
+    cpuUsagePercentage: Float!
+    ramUsageGigabytes: Float!
+    gpuVramUsageGigabytes: Float!
+    isSwapActive: Boolean!
+}
+
+# ==============================================================================
+# 🚀 PUNTOS DE ENTRADA COMPLEMENTARIOS (QUERIES Y MUTATIONS)
+# ==============================================================================
+
+type Query {
+    "Recupera todos los manuales activos que no estén obsoletos"
+    activeManuals: [TechnicalManual!]!
+
+    "Busca un incidente específico con toda su analítica anidada"
+    incidentById(id: ID!): LabIncident
+
+    "BÚSQUEDA SEMÁNTICA DIRECTA: Consulta fragmentos relevantes en pgvector"
+    searchKnowledge(query: String!, maxResults: Int!): [KnowledgeChunk!]!
+}
+
+type Mutation {
+    "Caso de Uso 1: Registra y segmenta un texto plano vinculándolo a un manual"
+    indexManualText(
+        manualId: ID!
+        rawText: String!
+        sectionName: String!
+    ): Boolean!
+
+    "Caso de Uso 2: Reporta un error de hardware, analiza métricas y genera diagnóstico con la IA"
+    reportIncident(
+        errorDescription: String!
+        metrics: ServerMetricsInput!
+    ): LabIncident!
+}
