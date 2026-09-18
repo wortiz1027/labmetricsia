@@ -38,7 +38,7 @@ public class TechnicalManualTest {
         assertEquals(1, chunks.size());
         assertEquals("K8S_DEPLOY", chunks.get(0).getSectionName());
         assertTrue(chunks.get(0).getTokenCountEstimate() >= 15);
-        //assertTrue(chunks.get(0).formatForContext().contains(String.format(template, SECTION, rawText)));
+        assertTrue(chunks.get(0).formatForContext().contains(String.format(template, SECTION, rawText)));
     }
 
     @Test
