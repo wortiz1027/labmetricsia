@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   cloud:
     vault:
       uri: http://${SECRET_MANAGER_HOSTNAME:srv-secret-manage}:8200
@@ -57,7 +59,7 @@ spring:
   ai:
     vectorstore:
       pgvector:
-        initialize-schema: true
+        initialize-schema: false
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 1536
