@@ -61,6 +61,27 @@
 				<spring.profiles.active>prod</spring.profiles.active>
 			</properties>
 		</profile>
+
+    <profile>
+        <id>unit-tests</id>
+        <properties>
+            <skip.unit.tests>false</skip.unit.tests>
+        </properties>
+    </profile>
+    <profile>
+        <id>integration-tests</id>
+        <properties>
+            <skip.integration.tests>false</skip.integration.tests>
+            <skip.unit.tests>true</skip.unit.tests>
+        </properties>
+    </profile>
+    <profile>
+        <id>all-tests</id>
+        <properties>
+            <skip.integration.tests>false</skip.integration.tests>
+            <skip.unit.tests>false</skip.unit.tests>
+        </properties>
+    </profile>
 	</profiles>
 
 	<properties>
@@ -69,6 +90,12 @@
       <archunit.version>1.5.0</archunit.version>
       <flyway.version>13.7.0</flyway.version>
       <spring-cloud.version>2025.1.2</spring-cloud.version>
+      <failsafe.version>3.6.0</failsafe.version>
+      <surefire.version>3.6.0</surefire.version>
+      <build-helper.version>3.6.2</build-helper.version>
+      <jacoco.version>0.8.15</jacoco.version>
+      <skip.unit.tests>true</skip.unit.tests>
+      <skip.integration.tests>true</skip.integration.tests>
 	</properties>
 
   <dependencyManagement>
@@ -253,6 +280,17 @@
 	</dependencies>
 
 	<build>
+    <testResources>
+        <testResource>
+            <directory>src/atest/resources</directory>
+        </testResource>
+        <testResource>
+            <directory>src/itest/resources</directory>
+        </testResource>
+        <testResource>
+            <directory>src/test/resources</directory>
+        </testResource>
+    </testResources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
@@ -277,27 +315,33 @@
 							</annotationProcessorPaths>
 						</configuration>
 					</execution>
-					<execution>
-						<id>default-testCompile</id>
-						<phase>test-compile</phase>
-						<goals>
-							<goal>testCompile</goal>
-						</goals>
-						<configuration>
-							<annotationProcessorPaths>
-								<path>
-									<groupId>org.projectlombok</groupId>
-									<artifactId>lombok</artifactId>
-								</path>
-							</annotationProcessorPaths>
-						</configuration>
-					</execution>
+
+          <execution>
+            <id>default-testCompile</id>
+            <phase>test-compile</phase>
+            <goals>
+                <goal>testCompile</goal>
+            </goals>
+            <configuration>
+                <compileSourceRoots>
+                    <compileSourceRoot>src/test/java</compileSourceRoot>
+                    <compileSourceRoot>src/atest/java</compileSourceRoot>
+                    <compileSourceRoot>src/itest/java</compileSourceRoot>
+                </compileSourceRoots>
+                <annotationProcessorPaths>
+                  <path>
+                    <groupId>org.projectlombok</groupId>
+                    <artifactId>lombok</artifactId>
+                  </path>
+                </annotationProcessorPaths>
+            </configuration>
+          </execution>
 				</executions>
 			</plugin>
       <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.11</version>
+          <version>${jacoco.version}</version>
           <executions>
             <execution>
               <id>prepare-agent</id>
@@ -313,10 +357,10 @@
               </goals>
               <configuration>
                 <excludes>
-                  <exclude>co/com/netec/devsoft/dto/**</exclude>
-                  <exclude>co/com/netec/devsoft/entity/**</exclude>
-                  <exclude>co/com/netec/devsoft/exception/**</exclude>
-                  <exclude>co/com/netec/devsoft/Application.class</exclude>
+                  <exclude>co/com/devsoft/dto/**</exclude>
+                  <exclude>co/com/devsoft/entity/**</exclude>
+                  <exclude>co/com/devsoft/exception/**</exclude>
+                  <exclude>co/com/devsoft/Application.class</exclude>
                 </excludes>
               </configuration>
             </execution>
@@ -351,6 +395,88 @@
                 </excludes>
               </configuration>
             </execution>
+          </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>${surefire.version}</version>
+        <configuration>
+            <groups>unitTest</groups>
+            <skipTests>${skip.unit.tests}</skipTests>
+            <includes>
+              <include>**/*UTest.java</include>
+            </includes>
+            <excludes>
+              <exclude>**/*ITest.java</exclude>
+            </excludes>
+            <testFailureIgnore>false</testFailureIgnore>
+            <parallel>classes</parallel>
+            <threadCount>4</threadCount>  <!-- CPUs/Cores/Threads-->
+            <perCoreThreadCount>true</perCoreThreadCount>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <version>${failsafe.version}</version>
+        <configuration>
+            <groups>integrationTest</groups>
+            <includes>
+                <include>**/*ITest.java</include>
+            </includes>
+            <testFailureIgnore>false</testFailureIgnore>
+            <forkCount>1</forkCount>
+            <reuseForks>true</reuseForks>
+            <reportsDirectory>${project.build.directory}/failsafe-reports</reportsDirectory>
+        </configuration>
+        <executions>
+            <execution>
+                <id>integration-tests</id>
+                <goals>
+                    <goal>integration-test</goal>
+                    <goal>verify</goal>
+                </goals>
+                <configuration>
+                    <skipTests>${skip.integration.tests}</skipTests>
+                </configuration>
+            </execution>
+        </executions>
+      </plugin>
+      <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>${build-helper.version}</version>
+          <executions>
+              <execution>
+                  <id>add-integration-test-sources</id>
+                  <phase>generate-test-sources</phase>
+                  <goals>
+                      <goal>add-test-source</goal>
+                  </goals>
+                  <configuration>
+                      <sources>
+                          <source>src/itest/java</source>
+                      </sources>
+                  </configuration>
+              </execution>
+              <execution>
+                  <id>add-integration-test-resources</id>
+                  <phase>generate-test-resources</phase>
+                  <goals>
+                      <goal>add-test-resource</goal>
+                  </goals>
+                  <configuration>
+                      <resources>
+                          <resource>
+                              <filtering>true</filtering>
+                              <directory>src/itest/resources</directory>
+                          </resource>
+                      </resources>
+                  </configuration>
+              </execution>
           </executions>
       </plugin>
 		</plugins>
