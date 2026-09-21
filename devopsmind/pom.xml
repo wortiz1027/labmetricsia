@@ -416,12 +416,10 @@
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
           <configuration>
-              <!-- 🎯 Desactivamos la ejecución global por defecto para controlarla estrictamente por sus IDs relacionales -->
               <skipTests>true</skipTests>
               <testFailureIgnore>false</testFailureIgnore>
           </configuration>
           <executions>
-              <!-- 🟢 EJECUCIÓN 1: PRUEBAS UNITARIAS TRADICIONALES (Mantiene tus 4 hilos en paralelo) -->
               <execution>
                   <id>unit-tests</id>
                   <phase>test</phase>
@@ -438,14 +436,12 @@
                           <exclude>**/*ITest.java</exclude>
                           <exclude>**/*ATest.java</exclude>
                       </excludes>
-                      <!-- 🚀 Conservamos tus optimizaciones de hardware para el dominio rico -->
                       <parallel>classes</parallel>
                       <threadCount>4</threadCount>
                       <perCoreThreadCount>true</perCoreThreadCount>
                   </configuration>
               </execution>
 
-              <!-- 📐 EJECUCIÓN 2: PRUEBAS DE ARQUITECTURA (ARCHUNIT EN SRC/ATEST/JAVA) -->
               <execution>
                   <id>architecture-tests</id>
                   <phase>test</phase>
@@ -456,13 +452,12 @@
                       <groups>archTest</groups>
                       <skipTests>${skip.arch.tests}</skipTests>
                       <includes>
-                          <include>**/*ATest.java</include> <!-- 🎯 Tu nuevo sufijo exclusivo para arquitectura -->
+                          <include>**/*ATest.java</include>
                       </includes>
                       <excludes>
                           <exclude>**/*UTest.java</exclude>
                           <exclude>**/*ITest.java</exclude>
                       </excludes>
-                      <!-- Las pruebas de arquitectura leen bytecode secuencialmente, no requieren hilos paralelos masivos -->
                       <parallel>none</parallel>
                   </configuration>
               </execution>
