@@ -56,4 +56,6 @@ public class TechnicalManualUTest {
         assertThrows(InvalidDomainStateException.class, () -> manual
                 .splitIntoChunks("Texto de prueba largo para intentar forzar la segmentación semántica.", "DOCKER"));
     }
+
+    
 }

@@ -66,4 +66,6 @@ class LabIncidentUTest {
 
         assertThrows(InvalidDomainStateException.class, () -> incident.attachDiagnosis(plan));
     }
+
+    
 }
