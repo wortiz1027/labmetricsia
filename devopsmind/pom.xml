@@ -66,20 +66,32 @@
         <id>unit-tests</id>
         <properties>
             <skip.unit.tests>false</skip.unit.tests>
+            <skip.integration.tests>true</skip.integration.tests>
+            <skip.arch.tests>true</skip.arch.tests>
         </properties>
     </profile>
     <profile>
         <id>integration-tests</id>
         <properties>
-            <skip.integration.tests>false</skip.integration.tests>
             <skip.unit.tests>true</skip.unit.tests>
+            <skip.integration.tests>false</skip.integration.tests>
+            <skip.arch.tests>true</skip.arch.tests>
+        </properties>
+    </profile>
+    <profile>
+        <id>arch-tests</id>
+        <properties>
+            <skip.unit.tests>true</skip.unit.tests>
+            <skip.integration.tests>true</skip.integration.tests>
+            <skip.arch.tests>false</skip.arch.tests>
         </properties>
     </profile>
     <profile>
         <id>all-tests</id>
         <properties>
-            <skip.integration.tests>false</skip.integration.tests>
             <skip.unit.tests>false</skip.unit.tests>
+            <skip.integration.tests>false</skip.integration.tests>
+            <skip.arch.tests>false</skip.arch.tests>
         </properties>
     </profile>
 	</profiles>
@@ -96,6 +108,7 @@
       <jacoco.version>0.8.15</jacoco.version>
       <skip.unit.tests>true</skip.unit.tests>
       <skip.integration.tests>true</skip.integration.tests>
+      <skip.arch.tests>true</skip.arch.tests>
 	</properties>
 
   <dependencyManagement>
@@ -399,23 +412,61 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <version>${surefire.version}</version>
-        <configuration>
-            <groups>unitTest</groups>
-            <skipTests>${skip.unit.tests}</skipTests>
-            <includes>
-              <include>**/*UTest.java</include>
-            </includes>
-            <excludes>
-              <exclude>**/*ITest.java</exclude>
-            </excludes>
-            <testFailureIgnore>false</testFailureIgnore>
-            <parallel>classes</parallel>
-            <threadCount>4</threadCount>  <!-- CPUs/Cores/Threads-->
-            <perCoreThreadCount>true</perCoreThreadCount>
-        </configuration>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${surefire.version}</version>
+          <configuration>
+              <!-- 🎯 Desactivamos la ejecución global por defecto para controlarla estrictamente por sus IDs relacionales -->
+              <skipTests>true</skipTests>
+              <testFailureIgnore>false</testFailureIgnore>
+          </configuration>
+          <executions>
+              <!-- 🟢 EJECUCIÓN 1: PRUEBAS UNITARIAS TRADICIONALES (Mantiene tus 4 hilos en paralelo) -->
+              <execution>
+                  <id>unit-tests</id>
+                  <phase>test</phase>
+                  <goals>
+                      <goal>test</goal>
+                  </goals>
+                  <configuration>
+                      <groups>unitTest</groups>
+                      <skipTests>${skip.unit.tests}</skipTests>
+                      <includes>
+                          <include>**/*UTest.java</include>
+                      </includes>
+                      <excludes>
+                          <exclude>**/*ITest.java</exclude>
+                          <exclude>**/*ATest.java</exclude>
+                      </excludes>
+                      <!-- 🚀 Conservamos tus optimizaciones de hardware para el dominio rico -->
+                      <parallel>classes</parallel>
+                      <threadCount>4</threadCount>
+                      <perCoreThreadCount>true</perCoreThreadCount>
+                  </configuration>
+              </execution>
+
+              <!-- 📐 EJECUCIÓN 2: PRUEBAS DE ARQUITECTURA (ARCHUNIT EN SRC/ATEST/JAVA) -->
+              <execution>
+                  <id>architecture-tests</id>
+                  <phase>test</phase>
+                  <goals>
+                      <goal>test</goal>
+                  </goals>
+                  <configuration>
+                      <groups>archTest</groups>
+                      <skipTests>${skip.arch.tests}</skipTests>
+                      <includes>
+                          <include>**/*ATest.java</include> <!-- 🎯 Tu nuevo sufijo exclusivo para arquitectura -->
+                      </includes>
+                      <excludes>
+                          <exclude>**/*UTest.java</exclude>
+                          <exclude>**/*ITest.java</exclude>
+                      </excludes>
+                      <!-- Las pruebas de arquitectura leen bytecode secuencialmente, no requieren hilos paralelos masivos -->
+                      <parallel>none</parallel>
+                  </configuration>
+              </execution>
+          </executions>
       </plugin>
 
       <plugin>
@@ -473,6 +524,34 @@
                           <resource>
                               <filtering>true</filtering>
                               <directory>src/itest/resources</directory>
+                          </resource>
+                      </resources>
+                  </configuration>
+              </execution>
+
+              <execution>
+                  <id>add-arch-test-sources</id>
+                  <phase>generate-test-sources</phase>
+                  <goals>
+                      <goal>add-test-source</goal>
+                  </goals>
+                  <configuration>
+                      <sources>
+                          <source>src/atest/java</source>
+                      </sources>
+                  </configuration>
+              </execution>
+              <execution>
+                  <id>add-arch-test-resources</id>
+                  <phase>generate-test-resources</phase>
+                  <goals>
+                      <goal>add-test-resource</goal>
+                  </goals>
+                  <configuration>
+                      <resources>
+                          <resource>
+                              <filtering>true</filtering>
+                              <directory>src/atest/resources</directory>
                           </resource>
                       </resources>
                   </configuration>
