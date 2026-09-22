@@ -1,4 +1,4 @@
-package co.com.devsoft.devopsmind.infrastructure.adapter;
+package co.com.devsoft.devopsmind.infrastructure.adapter.output;
 
 import java.util.Arrays;
 import java.util.List;
