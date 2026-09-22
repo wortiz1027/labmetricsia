@@ -351,6 +351,7 @@
           </execution>
 				</executions>
 			</plugin>
+
       <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
@@ -408,6 +409,35 @@
                 </excludes>
               </configuration>
             </execution>
+          </executions>
+      </plugin>
+
+      <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <executions>
+              <execution>
+                  <id>overlay-jacoco-css</id>
+                  <phase>site</phase>
+                  <goals>
+                      <goal>copy-resources</goal>
+                  </goals>
+                  <configuration>
+                      <outputDirectory>
+                          ${project.reporting.outputDirectory}/jacoco/jacoco-resources
+                      </outputDirectory>
+                      <resources>
+                          <resource>
+                              <directory>src/main/resources/jacoco/</directory>
+                               <includes>
+                                    <include>report.css</include>
+                                </includes>
+                              <filtering>false</filtering>
+                          </resource>
+                      </resources>
+                      <overwrite>true</overwrite>
+                  </configuration>
+              </execution>
           </executions>
       </plugin>
 
@@ -491,6 +521,7 @@
             </execution>
         </executions>
       </plugin>
+
       <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>build-helper-maven-plugin</artifactId>
