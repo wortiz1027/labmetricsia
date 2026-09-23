@@ -3,16 +3,32 @@ package co.com.devsoft.devopsmind.infrastructure.config.database;
 import javax.sql.DataSource;
 
 import org.flywaydb.core.Flyway;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.autoconfigure.DataSourceProperties;
+import org.springframework.boot.jpa.EntityManagerFactoryBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import com.zaxxer.hikari.HikariDataSource;
 
 @Configuration
 public class SQLDatasourceConfig {
+
+    @Primary
+    @Bean(name = "entityManagerFactory")
+    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+            EntityManagerFactoryBuilder builder,
+            @Qualifier("mysqlDataSource") DataSource mysqlDataSource) {
+
+        return builder
+                .dataSource(mysqlDataSource)
+                .packages("co.com.devsoft.devopsmind.infrastructure.adapter.output.mysql.entities")
+                .persistenceUnit("mysqlPersistenceUnit")
+                .build();
+    }
 
     @Bean
     @Primary
