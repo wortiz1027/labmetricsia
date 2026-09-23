@@ -44,7 +44,6 @@ public final class LabIncidentMapper {
             planEntity.setAnalysisConclusion(domain.getSolutionPlan().getAnalysisConclusion());
             planEntity.setRequiresKernelReboot(domain.getSolutionPlan().isRequiresKernelReboot());
 
-            // 🎯 Serialización manual a JSON array sin depender de Jackson en el core
             String jsonSteps = domain.getSolutionPlan().getStepsToSolve().stream()
                     .map(step -> "\"" + step.replace("\"", "\\\"") + "\"")
                     .collect(Collectors.joining(",", "[", "]"));
@@ -59,10 +58,8 @@ public final class LabIncidentMapper {
     public static LabIncident toDomain(LabIncidentEntity entity) {
         if (entity == null) return null;
 
-        // Usamos reflexión momentánea o extendemos un constructor semilla para recrear el ID inmutable
         LabIncident domain = new LabIncident(entity.getErrorDescription());
 
-        // Reinyectamos los estados ricos de negocio de forma controlada
         try {
             java.lang.reflect.Field idField = LabIncident.class.getDeclaredField("id");
             idField.setAccessible(true);
@@ -86,7 +83,6 @@ public final class LabIncidentMapper {
         }
 
         if (entity.getSolutionPlan() != null) {
-            // 🎯 Deserialización rústica y veloz del arreglo JSON
             String cleanJson = entity.getSolutionPlan().getStepsToSolve()
                     .replaceAll("[\\[\\]\"]", "");
             List<String> steps = Arrays.asList(cleanJson.split(","));

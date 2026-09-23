@@ -27,12 +27,12 @@ import co.com.devsoft.devopsmind.infrastructure.adapter.exceptions.UseCaseTransa
 public class UseCaseTransactionConfig {
 
     @Bean
-    public TransactionalUseCaseAspect TransactionalUseCaseAspect(UseCaseTransactionExecutor executor) {
+    TransactionalUseCaseAspect TransactionalUseCaseAspect(UseCaseTransactionExecutor executor) {
         return new TransactionalUseCaseAspect(executor);
     }
 
     @Bean
-    public UseCaseTransactionExecutor UseCaseTransactionExecutor() {
+    UseCaseTransactionExecutor UseCaseTransactionExecutor() {
         return new UseCaseTransactionExecutor();
     }
 

@@ -37,7 +37,6 @@ public class ServerMetricsEntity {
     public ServerMetricsEntity() {
     }
 
-    // Getters y Setters estándar
     public Long getId() {
         return id;
     }

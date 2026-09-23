@@ -38,7 +38,6 @@ public class TechnicalManualEntity {
     @Column(name = "chunk_count")
     private Integer chunkCount = 0;
 
-    // Getters, Setters y Constructores estándar para JPA
     public TechnicalManualEntity() {
     }
 

@@ -32,7 +32,6 @@ public class LabIncidentEntity {
     public LabIncidentEntity() {
     }
 
-    // Getters y Setters estándar
     public String getId() {
         return id;
     }

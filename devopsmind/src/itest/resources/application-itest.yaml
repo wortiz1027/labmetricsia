@@ -1,0 +1,35 @@
+# ==============================================================================
+# 🚦 CONFIGURACIÓN CRÍTICA EXCLUSIVA PARA EL ENTORNO DE INTEGRACIÓN (FAILSAFE)
+# ==============================================================================
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  data:
+    mongodb:
+      auto-index-creation: true
+  ai:
+    ollama:
+      base-url: ${TEST_CONTAINER_OLLAMA_URL}
+      init:
+        pull-model-strategy: when_missing
+      chat:
+        model: llama3.2
+        temperature: 0.7
+    vectorstore:
+      pgvector:
+        initialize-schema: false
+
+  storages:
+    providers:
+      mysql:
+        url: ${TEST_CONTAINER_MYSQL_URL}
+        username: ${TEST_CONTAINER_MYSQL_USER}
+        password: ${TEST_CONTAINER_MYSQL_PASSWORD}
+        driver-class-name: com.mysql.cj.jdbc.Driver
+      postgres:
+        url: ${TEST_CONTAINER_POSTGRES_URL}
+        username: ${TEST_CONTAINER_POSTGRES_USER}
+        password: ${TEST_CONTAINER_POSTGRES_PASSWORD}
+        driver-class-name: org.postgresql.Driver
+      mongodb:
+        uri: ${TEST_CONTAINER_MONGO_URI:mongodb://localhost:27017/ai_chat_memory}

@@ -29,9 +29,9 @@ public class ManualIndexingService implements IndexManualUseCase {
         log.info("🤖 [Servicio Aplicación] Iniciando indexación RAG para Manual ID: {}", id.getValue());
 
         TechnicalManual manual = this.storage.findBy(id)
-                                        .orElseThrow(() -> new InvalidDomainDataException(String.format(
-                                                                    "No se puede indexar: El manual técnico con ID '%s' no existe en el sistema.",
-                                                                    id.getValue())));
+                .orElseThrow(() -> new InvalidDomainDataException(String.format(
+                        "No se puede indexar: El manual técnico con ID '%s' no existe en el sistema.",
+                        id.getValue())));
         List<KnowledgeChunk> chunks = manual.splitIntoChunks(rawText, sectionName);
 
         if (chunks.isEmpty()) {
@@ -45,7 +45,7 @@ public class ManualIndexingService implements IndexManualUseCase {
         this.storage.saveVectorChunks(id, chunks);
         this.storage.saveMetadata(manual);
 
-        log.info("✅ [Servicio Aplicación] ¡Manual '%s' indexado semánticamente con éxito!", manual.getTitle());
+        log.info("✅ [Servicio Aplicación] ¡Manual '{}' indexado semánticamente con éxito!", manual.getTitle());
     }
 
 }

@@ -5,6 +5,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.ai.chat.client.ChatClient;
+import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
+import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.stereotype.Component;
 
 import co.com.devsoft.devopsmind.domain.model.DiagnosticPlan;
@@ -16,14 +18,16 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
     private final ChatClient chatClient;
 
-    public DiagnosticSpringAiAdapter(ChatClient.Builder chatClientBuilder) {
+    public DiagnosticSpringAiAdapter(ChatClient.Builder chatClientBuilder, ChatMemory chatMemory) {
         this.chatClient = chatClientBuilder.defaultSystem("""
                 Eres un Ingeniero DevOps SRE experto en el laboratorio LabMetricsIA.
                 Tu misión es analizar la descripción de un error y las métricas de hardware actuales,
                 utilizar el contexto técnico provisto de los manuales y devolver un plan de diagnóstico estructurado.
                 Debes responder estrictamente en el siguiente formato separado por la palabra '|':
                 CONCLUSION_DEL_ANALISIS | PASO_1, PASO_2, PASO_3 | REQUIERE_REBOOT_KERNEL(true/false)
-                """).build();
+                """)
+                .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .build();
     }
 
     @Override
@@ -42,13 +46,14 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
         String rawAiResponse = chatClient.prompt()
                 .user(promptUser)
+                .advisors(a -> a.param("chat_memory_conversation_id", "LAB-SRE-CONVERSATION-THREAD"))
                 .call()
                 .content();
 
         return parseAIResponse(rawAiResponse);
     }
 
-     private DiagnosticPlan parseAIResponse(String response) {
+    private DiagnosticPlan parseAIResponse(String response) {
         try {
             String[] parts = response.split("\\|");
             String conclusion = parts[0].trim();

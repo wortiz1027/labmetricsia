@@ -16,15 +16,20 @@ import org.springframework.jdbc.core.JdbcTemplate;
 @Configuration
 public class VectorStoreConfig {
 
+    @Bean(name = "postgresJdbcTemplate")
+    JdbcTemplate postgresJdbcTemplate(@Qualifier("postgresDataSource") DataSource postgresDataSource) {
+        return new JdbcTemplate(postgresDataSource);
+    }
+
     @Bean
-    public VectorStore vectorStore(
-            @Qualifier("postgresDataSource") DataSource postgresDataSource,
+    VectorStore vectorStore(
+            @Qualifier("postgresJdbcTemplate") DataSource postgresDataSource,
             EmbeddingModel embeddingModel) {
 
         JdbcTemplate postgresJdbcTemplate = new JdbcTemplate(postgresDataSource);
 
         return PgVectorStore.builder(postgresJdbcTemplate, embeddingModel)
-                .dimensions(1536)
+                .dimensions(1024)
                 .distanceType(COSINE_DISTANCE)
                 .indexType(HNSW)
                 .vectorTableName("vector_store")

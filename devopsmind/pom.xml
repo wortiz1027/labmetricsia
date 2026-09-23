@@ -207,7 +207,7 @@
     <!--dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-flyway</artifactId>
-    </dependency-->
+    </dependency>
 
     <dependency>
         <groupId>org.springframework.cloud</groupId>
@@ -216,7 +216,7 @@
     <dependency>
         <groupId>org.springframework.cloud</groupId>
         <artifactId>spring-cloud-vault-config-databases</artifactId>
-    </dependency>
+    </dependency-->
 
 		<dependency>
         <groupId>org.springframework.boot</groupId>
@@ -445,6 +445,13 @@
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <version>${surefire.version}</version>
+          <dependencies>
+              <dependency>
+                  <groupId>com.tngtech.archunit</groupId>
+                  <artifactId>archunit-junit5-engine</artifactId>
+                  <version>1.3.0</version> <!-- Reemplaza por tu versión de ArchUnit -->
+              </dependency>
+          </dependencies>
           <configuration>
               <skipTests>true</skipTests>
               <testFailureIgnore>false</testFailureIgnore>
@@ -516,7 +523,7 @@
                     <goal>verify</goal>
                 </goals>
                 <configuration>
-                    <skipTests>${skip.integration.tests}</skipTests>
+                    <skipTests>false</skipTests>
                 </configuration>
             </execution>
         </executions>

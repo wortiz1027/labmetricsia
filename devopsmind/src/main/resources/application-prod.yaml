@@ -1,13 +1,13 @@
 spring:
-  cloud:
-    vault:
-      uri: http://${SECRET_MANAGER_HOSTNAME}:8200
-      authentication: TOKEN
-      token: ${TOKEN_SECRET_MANAGER}
-      kv:
-        enabled: true
-        backend: secret
-        default-context: devopsmind
+  #cloud:
+  #  vault:
+  #    uri: http://${SECRET_MANAGER_HOSTNAME}:8200
+  #    authentication: TOKEN
+  #    token: ${TOKEN_SECRET_MANAGER}
+  #    kv:
+  #      enabled: true
+  #      backend: secret
+  #      default-context: devopsmind
   jpa:
     hibernate:
       ddl-auto: validate

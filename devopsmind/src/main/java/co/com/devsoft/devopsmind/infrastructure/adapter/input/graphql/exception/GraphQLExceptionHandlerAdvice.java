@@ -16,7 +16,7 @@ public class GraphQLExceptionHandlerAdvice {
     public GraphQLError handleResourceNotFound(ResourceNotFoundException ex) {
         return GraphqlErrorBuilder.newError()
                 .message(ex.getMessage())
-                .errorType(ErrorType.NOT_FOUND) // Código semántico equivalente a 404
+                .errorType(ErrorType.NOT_FOUND)
                 .build();
     }
 
@@ -24,7 +24,7 @@ public class GraphQLExceptionHandlerAdvice {
     public GraphQLError handleInvalidData(InvalidDomainDataException ex) {
         return GraphqlErrorBuilder.newError()
                 .message(ex.getMessage())
-                .errorType(ErrorType.BAD_REQUEST) // Código semántico equivalente a 400
+                .errorType(ErrorType.BAD_REQUEST)
                 .build();
     }
 
@@ -32,7 +32,7 @@ public class GraphQLExceptionHandlerAdvice {
     public GraphQLError handleInvalidState(InvalidDomainStateException ex) {
         return GraphqlErrorBuilder.newError()
                 .message(ex.getMessage())
-                .errorType(ErrorType.INTERNAL_ERROR) // Código semántico equivalente a 500
+                .errorType(ErrorType.INTERNAL_ERROR)
                 .build();
     }
 }

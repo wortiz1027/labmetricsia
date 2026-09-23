@@ -5,31 +5,28 @@ import static com.tngtech.archunit.lang.syntax.ArchRuleDefinition.noClasses;
 import static com.tngtech.archunit.library.Architectures.layeredArchitecture;
 
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Tag;
-import org.junit.jupiter.api.Tags;
-import org.junit.jupiter.api.Test;
 
 import com.tngtech.archunit.core.domain.JavaClasses;
-import com.tngtech.archunit.core.importer.ClassFileImporter;
 import com.tngtech.archunit.core.importer.ImportOption;
+import com.tngtech.archunit.junit.AnalyzeClasses;
+import com.tngtech.archunit.junit.ArchTag;
+import com.tngtech.archunit.junit.ArchTags;
+import com.tngtech.archunit.junit.ArchTest;
 import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.library.Architectures;;
 
-@Tags({
-        @Tag("archTest")
+@ArchTags({
+        @ArchTag("archTest")
 })
+@AnalyzeClasses(packages = "co.com.devsoft.devopsmind", importOptions = { ImportOption.DoNotIncludeTests.class })
 @DisplayName("📐 Pruebas de Arquitectura :: Control de Fronteras Hexagonales")
 class HexagonalArchitectureATest {
 
     private static final String BASE_PACKAGE = "co.com.devsoft.devopsmind";
 
-    private final JavaClasses classes = new ClassFileImporter()
-            .withImportOption(ImportOption.Predefined.DO_NOT_INCLUDE_TESTS)
-            .importPackages(BASE_PACKAGE);
-
-    @Test
+    @ArchTest
     @DisplayName("📌 Regla de Oro: El Dominio debe ser 100% independiente de capas externas")
-    void domainShouldBeIndependent() {
+    public static final void domainShouldBeIndependent(JavaClasses classes) {
         Architectures.LayeredArchitecture architecture = layeredArchitecture()
                 .consideringOnlyDependenciesInAnyPackage(BASE_PACKAGE)
                 .layer("Domain").definedBy(String.format("%s%s", BASE_PACKAGE, ".domain.."))
@@ -42,28 +39,30 @@ class HexagonalArchitectureATest {
         architecture.check(classes);
     }
 
-    @Test
+    @ArchTest
     @DisplayName("🛡️ Regla de Pureza: El Dominio no debe estar contaminado por Spring o JPA")
-    void domainShouldBeFrameworkFree() {
+    void domainShouldBeFrameworkFree(JavaClasses classes) {
         ArchRule rule = classes().that()
                 .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".domain.."))
                 .should()
                 .onlyDependOnClassesThat()
                 .resideInAnyPackage("java..",
                         String.format("%s%s", BASE_PACKAGE, ".domain.."),
-                        "org.slf4j..");
+                        "org.slf4j..")
+                .because(""); // TODO: llenar descripcion
 
         rule.check(classes);
     }
 
-    @Test
+    @ArchTest
     @DisplayName("📌 Regla de Nomenclatura: Los servicios y controladores deben seguir la convención")
-    void interfacesAndServicesShouldHaveCorrectSuffixes() {
+    void interfacesAndServicesShouldHaveCorrectSuffixes(JavaClasses classes) {
         ArchRule serviceRule = classes()
                 .that()
                 .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".application.service.."))
                 .should()
-                .haveSimpleNameEndingWith("Service");
+                .haveSimpleNameEndingWith("Service")
+                .because(""); // TODO: llenar descripcion
 
         ArchRule restRule = classes()
                 .that()
@@ -71,7 +70,8 @@ class HexagonalArchitectureATest {
                 .and()
                 .haveSimpleNameContaining("RestController")
                 .should()
-                .haveSimpleNameEndingWith("RestController");
+                .haveSimpleNameEndingWith("RestController")
+                .because(""); // TODO: llenar descripcion
 
         ArchRule graphqlRule = classes()
                 .that()
@@ -79,22 +79,24 @@ class HexagonalArchitectureATest {
                 .and()
                 .haveSimpleNameContaining("Controller")
                 .should()
-                .haveSimpleNameEndingWith("Controller");
+                .haveSimpleNameEndingWith("Controller")
+                .because(""); // TODO: llenar descripcion
 
         serviceRule.check(classes);
         restRule.check(classes);
         graphqlRule.check(classes);
     }
 
-    @Test
+    @ArchTest
     @DisplayName("🛡️ Regla de Control de Flujo: Los controladores no deben puentear a los UseCases")
-    void controllersShouldOnlyDependOnUseCasesNotOnStorage() {
+    void controllersShouldOnlyDependOnUseCasesNotOnStorage(JavaClasses classes) {
         ArchRule flowRule = noClasses()
                 .that()
                 .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".infrastructure.adapter.input.."))
                 .should()
                 .dependOnClassesThat()
-                .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".domain.repository.."));
+                .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".domain.repository.."))
+                .because(""); // TODO: llenar descripcion
 
         flowRule.check(classes);
     }

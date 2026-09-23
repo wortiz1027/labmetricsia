@@ -1,6 +1,5 @@
 package co.com.devsoft.devopsmind.application.service;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -40,13 +39,15 @@ public class IncidentAnalysisService implements AnalyzeIncidentUseCase {
 
         LabIncident incident = new LabIncident(errorDescription);
 
+        incident.evaluateSeverity(metrics);
+
         List<KnowledgeChunk> contextChunks = this.manualStorage.findRelevantChunks(errorDescription, 3);
 
         String formattedContext = contextChunks.stream()
                 .map(KnowledgeChunk::formatForContext)
                 .collect(Collectors.joining("\n"));
 
-        log.info("🤖 [Servicio Aplicación] Solicitando diagnóstico al motor cognitivo abstratado...");
+        log.info("🤖 [Servicio Aplicación] Solicitando diagnóstico al motor cognitivo de Ollama...");
         DiagnosticPlan aiPlan = this.aiEngine.generatePlan(errorDescription, metrics, formattedContext);
 
         if (aiPlan.hasForbiddenCommands()) {
@@ -59,10 +60,10 @@ public class IncidentAnalysisService implements AnalyzeIncidentUseCase {
         }
 
         incident.attachDiagnosis(aiPlan);
+
         this.incidentStorage.save(incident);
 
-        log.info("🎉 [Servicio Aplicación] Análisis de incidente completado de forma segura. Estado Final: {}",
-                incident.getStatus());
+        log.info("🎉 [Servicio Aplicación] Análisis de incidente completado de forma segura. ID: {}", incident.getId());
 
         return incident;
     }

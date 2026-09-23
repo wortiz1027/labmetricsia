@@ -3,8 +3,6 @@ package co.com.devsoft.devopsmind.infrastructure.adapter.input.graphql;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.graphql.data.method.annotation.Argument;
 import org.springframework.graphql.data.method.annotation.MutationMapping;
 import org.springframework.graphql.data.method.annotation.QueryMapping;
@@ -24,8 +22,6 @@ import co.com.devsoft.devopsmind.infrastructure.adapter.input.graphql.mapper.Gra
 
 @Controller
 public class LabMetricsGraphQLController {
-
-    private static final Logger log = LoggerFactory.getLogger(LabMetricsGraphQLController.class);
 
     private final IndexManualUseCase indexManualUseCase;
     private final AnalyzeIncidentUseCase analyzeIncidentUseCase;

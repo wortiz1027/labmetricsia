@@ -9,6 +9,7 @@ import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import co.com.devsoft.devopsmind.domain.model.KnowledgeChunk;
@@ -31,7 +32,7 @@ public class TechnicalManualStorageAdapter implements TechnicalManualStorage {
     }
 
     @Override
-    @Transactional("transactionManager")
+    @Transactional(value = "transactionManager", propagation =  Propagation.NOT_SUPPORTED)
     public TechnicalManual saveMetadata(TechnicalManual manual) {
         TechnicalManualEntity entity = TechnicalManualMapper.toEntity(manual);
 
