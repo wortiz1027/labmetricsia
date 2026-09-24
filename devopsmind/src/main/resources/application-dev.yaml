@@ -1,6 +1,7 @@
 spring:
   main:
     allow-bean-definition-overriding: true
+
   #cloud:
   #  vault:
   #    uri: http://${SECRET_MANAGER_HOSTNAME:srv-secret-manage}:8200
