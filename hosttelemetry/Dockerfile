@@ -21,17 +21,20 @@
 FROM eclipse-temurin:25-jdk-alpine AS builder
 WORKDIR /build
 
-COPY gradle/ gradle/
-COPY gradlew build.gradle settings.gradle gradle.properties ./
+# Copiar el archivo de definición de dependencias y el wrapper de Maven
+COPY .mvn/ .mvn/
+COPY mvnw pom.xml ./
 
-RUN ./gradlew dependencies --no-daemon || true
+# Descargar dependencias en caché para acelerar construcciones futuras
+RUN ./mvnw dependency:go-offline -B || true
 
+# Copiar el código fuente y empaquetar aplicando el perfil 'prod' de Maven
 COPY src/ src/
+RUN ./mvnw clean package -DskipTests -B -Pprod
 
-RUN ./gradlew bootJar --no-daemon -x test
-
+# 🚀 ESTRATEGIA DE EXTRACCIÓN INFALIBLE: Descomprimir el JAR nativamente para crear las capas
 WORKDIR /build/extracted
-RUN java -Djarmode=layertools -jar /build/build/libs/*.jar extract
+RUN jar -xf /build/target/*.jar
 
 # ==========================================
 # FASE 2: Entorno de Ejecución (Runtime Stage)
@@ -50,16 +53,16 @@ ARG BUILD_REVISION
 
 # Informacion de la persona que mantiene la imagen
 LABEL org.opencontainers.image.created=$BUILD_DATE \
-	  org.opencontainers.image.authors="@DevSoft Team" \
-	  org.opencontainers.image.url="https://github.com/wortiz1027/dvdrental/blob/main/Dockerfile" \
-	  org.opencontainers.image.documentation="" \
-	  org.opencontainers.image.source="https://github.com/wortiz1027/dvdrental/blob/main/Dockerfile" \
-	  org.opencontainers.image.version=$BUILD_VERSION \
-	  org.opencontainers.image.revision=$BUILD_REVISION \
-	  org.opencontainers.image.vendor="Develment Software Team | https://www.devsoft.com.co/" \
-	  org.opencontainers.image.licenses="" \
-	  org.opencontainers.image.title="Backend para la gestion de renta de dvds" \
-	  org.opencontainers.image.description="Componente encargado de gestionar la informacion de la renta de dvds"
+    org.opencontainers.image.authors="@DevSoft Team" \
+    org.opencontainers.image.url="https://github.com/wortiz1027/labmetricsia/blob/main/Dockerfile" \
+    org.opencontainers.image.documentation="" \
+    org.opencontainers.image.source="https://github.com/wortiz1027/labmetricsia/blob/main/Dockerfile" \
+    org.opencontainers.image.version=$BUILD_VERSION \
+    org.opencontainers.image.revision=$BUILD_REVISION \
+    org.opencontainers.image.vendor="Develment Software Team | https://www.devsoft.com.co/" \
+    org.opencontainers.image.licenses="" \
+    org.opencontainers.image.title="Backend para la gestion de spring ia" \
+    org.opencontainers.image.description="Componente encargado de gestionar la informacion de consultas de devops con modelos llm"
 
 COPY --from=builder /build/extracted/dependencies/ ./
 COPY --from=builder /build/extracted/spring-boot-loader/ ./
@@ -68,6 +71,6 @@ COPY --from=builder /build/extracted/application/ ./
 
 ENV JAVA_OPTS="-XX:+UseZGC -XX:+ZGenerational -XX:+UnlockDiagnosticVMOptions -Dfile.encoding=UTF-8 -XX:+AlwaysPreTouch -Xss256k"
 
-EXPOSE 8080 9090 50051
+EXPOSE 8081
 
 ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
