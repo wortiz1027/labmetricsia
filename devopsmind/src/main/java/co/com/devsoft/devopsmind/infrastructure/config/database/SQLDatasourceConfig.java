@@ -19,7 +19,7 @@ public class SQLDatasourceConfig {
 
     @Primary
     @Bean(name = "entityManagerFactory")
-    public LocalContainerEntityManagerFactoryBean entityManagerFactory(
+    LocalContainerEntityManagerFactoryBean entityManagerFactory(
             EntityManagerFactoryBuilder builder,
             @Qualifier("mysqlDataSource") DataSource mysqlDataSource) {
 
@@ -33,15 +33,16 @@ public class SQLDatasourceConfig {
     @Bean
     @Primary
     @ConfigurationProperties("spring.storages.providers.mysql")
-    public DataSourceProperties mysqlProperties() {
+    DataSourceProperties mysqlProperties() {
         return new DataSourceProperties();
     }
 
     @Bean
     @Primary
-    public DataSource mysqlDataSource() {
+    DataSource mysqlDataSource() {
         HikariDataSource dataSource = mysqlProperties()
                 .initializeDataSourceBuilder()
+                .url(mysqlProperties().getUrl())
                 .type(HikariDataSource.class)
                 .build();
 
@@ -55,12 +56,12 @@ public class SQLDatasourceConfig {
 
     @Bean
     @ConfigurationProperties("spring.storages.providers.postgres")
-    public DataSourceProperties postgresDataSourceProperties() {
+    DataSourceProperties postgresDataSourceProperties() {
         return new DataSourceProperties();
     }
 
     @Bean(name = "postgresDataSource")
-    public DataSource postgresDataSource() {
+    DataSource postgresDataSource() {
         HikariDataSource dataSource = postgresDataSourceProperties()
                 .initializeDataSourceBuilder()
                 .type(HikariDataSource.class)

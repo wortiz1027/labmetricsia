@@ -27,10 +27,10 @@ public class TechnicalManualUTest {
     @Test
     @DisplayName("📌 Regla 2: Debería segmentar el texto y aceptar solo chunks con suficiente densidad de datos")
     void shouldSplitTextAndAcceptOnlyDescriptiveChunks() {
-        String template = """
-                --- SECTION :: %s ---
-                    Content: %s
-                """;
+        //String template = """
+        //        --- SECTION :: %s ---
+        //            Content: %s
+        //        """;
         final String SECTION = "K8S_DEPLOY";
         TechnicalManual manual = new TechnicalManual(ManualId.generate(), "Manual de Kubernetes");
         String rawText = "Este es un párrafo de configuración avanzado para desplegar pods de alta disponibilidad usando arquitecturas de réplicas en nodos distribuidos.\n\nCorto.";
@@ -57,5 +57,5 @@ public class TechnicalManualUTest {
                 .splitIntoChunks("Texto de prueba largo para intentar forzar la segmentación semántica.", "DOCKER"));
     }
 
-    
+
 }

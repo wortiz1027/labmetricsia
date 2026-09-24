@@ -38,7 +38,8 @@ public class MySQLManagedContainer implements ManagedContainer {
 
     @Override
     public void registerProperties(DynamicPropertyRegistry registry) {
-        registry.add("TEST_CONTAINER_MYSQL_URL", MYSQL::getJdbcUrl);
+        registry.add("TEST_CONTAINER_MYSQL_URL",
+                () -> MYSQL.getJdbcUrl() + "?useUnicode=true&characterEncoding=UTF-8&serverTimezone=UTC");
         registry.add("TEST_CONTAINER_MYSQL_USER", MYSQL::getUsername);
         registry.add("TEST_CONTAINER_MYSQL_PASSWORD", MYSQL::getPassword);
     }

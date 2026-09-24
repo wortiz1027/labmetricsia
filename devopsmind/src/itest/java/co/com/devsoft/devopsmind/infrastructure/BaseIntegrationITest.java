@@ -5,6 +5,7 @@ import java.util.List;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Tags;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
@@ -19,7 +20,7 @@ import co.com.devsoft.devopsmind.it.shared.containers.PostgreSQLManagedContainer
         @Tag("integrationTest")
 })
 @ActiveProfiles("itest")
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 public abstract class BaseIntegrationITest {
 
     private static final List<ManagedContainer> CONTAINERS;

@@ -14,7 +14,7 @@ spring:
         pull-model-strategy: when_missing
       chat:
         model: llama3.2
-        temperature: 0.7
+        temperature: 0.0
     vectorstore:
       pgvector:
         initialize-schema: false

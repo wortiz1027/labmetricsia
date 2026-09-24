@@ -16,7 +16,7 @@ import com.tngtech.archunit.lang.ArchRule;
 import com.tngtech.archunit.library.Architectures;;
 
 @ArchTags({
-        @ArchTag("archTest")
+    @ArchTag("archTest")
 })
 @AnalyzeClasses(packages = "co.com.devsoft.devopsmind", importOptions = { ImportOption.DoNotIncludeTests.class })
 @DisplayName("📐 Pruebas de Arquitectura :: Control de Fronteras Hexagonales")
@@ -49,7 +49,9 @@ class HexagonalArchitectureATest {
                 .resideInAnyPackage("java..",
                         String.format("%s%s", BASE_PACKAGE, ".domain.."),
                         "org.slf4j..")
-                .because(""); // TODO: llenar descripcion
+                .because("El Dominio debe ser el núcleo puro del negocio, 100% agnóstico a frameworks, " +
+                        "especificaciones de bases de datos o tecnologías de infraestructura externa " +
+                        "para garantizar la máxima portabilidad, testabilidad y evolución del laboratorio.");
 
         rule.check(classes);
     }
@@ -62,7 +64,9 @@ class HexagonalArchitectureATest {
                 .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".application.service.."))
                 .should()
                 .haveSimpleNameEndingWith("Service")
-                .because(""); // TODO: llenar descripcion
+                .because("Los componentes de la capa de aplicación que implementan la lógica de orquestación " +
+                        "de los Casos de Uso (Puertos de Entrada) deben poseer el sufijo 'Service' para " +
+                        "garantizar una consistencia semántica absoluta y una rápida identificación en el monorrepo.");
 
         ArchRule restRule = classes()
                 .that()
@@ -71,7 +75,9 @@ class HexagonalArchitectureATest {
                 .haveSimpleNameContaining("RestController")
                 .should()
                 .haveSimpleNameEndingWith("RestController")
-                .because(""); // TODO: llenar descripcion
+                .because("Los adaptadores de entrada encargados de exponer los endpoints HTTP/REST del sistema " +
+                        "deben seguir la convención tipográfica estricta terminando en 'RestController' " +
+                        "para diferenciarse claramente de las fronteras GraphQL, gRPC o CLI del monorrepo.");
 
         ArchRule graphqlRule = classes()
                 .that()
@@ -80,7 +86,9 @@ class HexagonalArchitectureATest {
                 .haveSimpleNameContaining("Controller")
                 .should()
                 .haveSimpleNameEndingWith("Controller")
-                .because(""); // TODO: llenar descripcion
+                .because("Los adaptadores de entrada de la infraestructura GraphQL encargados de resolver queries y mutations "+
+                        "deben seguir la convención tipográfica terminando en 'Controller' para asegurar la consistencia " +
+                        "con el framework Spring GraphQL y distinguirse claramente de los adaptadores RESTful HTTP.");
 
         serviceRule.check(classes);
         restRule.check(classes);
@@ -96,7 +104,11 @@ class HexagonalArchitectureATest {
                 .should()
                 .dependOnClassesThat()
                 .resideInAPackage(String.format("%s%s", BASE_PACKAGE, ".domain.repository.."))
-                .because(""); // TODO: llenar descripcion
+                .because("Los adaptadores de entrada (Fronteras de Red REST/GraphQL) tienen estrictamente " +
+                        "prohibido omitir la capa de aplicación y comunicarse de forma directa con los almacenes " +
+                        "de persistencia del dominio. Toda interacción exterior debe ser orquestada obligatoriamente " +
+                        "a través de un Caso de Uso (Puerto de Entrada) para salvaguardar la gobernanza, la transaccionalidad " +
+                        "y las auditorías cognitivas de seguridad de la solución.");
 
         flowRule.check(classes);
     }

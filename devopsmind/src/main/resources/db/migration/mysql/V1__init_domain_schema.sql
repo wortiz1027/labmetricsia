@@ -46,7 +46,6 @@ CREATE TABLE IF NOT EXISTS tb_diagnostic_plans (
     generated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-
 -- ==============================================================================
 -- 📐 PARTE 2: DEFINICIÓN DE LLAVES FORÁNEAS E ÍNDICES DE RENDIMIENTO (AISLADOS)
 -- ==============================================================================
