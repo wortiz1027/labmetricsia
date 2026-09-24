@@ -12,7 +12,6 @@ public interface TechnicalManualStorage {
     Optional<TechnicalManual> findBy(ManualId id);
     List<TechnicalManual> findActiveManuals();
 
-    // Operaciones del almacén de conocimiento vectorial (RAG)
     void saveVectorChunks(ManualId id, List<KnowledgeChunk> chunks);
     List<KnowledgeChunk> findRelevantChunks(String query, int maxResults);
 }

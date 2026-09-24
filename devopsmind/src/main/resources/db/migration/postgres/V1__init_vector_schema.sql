@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS vector_store (
     id UUID NOT NULL DEFAULT gen_random_uuid(),
     content TEXT NOT NULL,
     metadata JSONB,
-    embedding VECTOR(1536)
+    embedding VECTOR(1024)
 );
 
 -- ==============================================================================

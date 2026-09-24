@@ -8,12 +8,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.List;
 
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 
 import co.com.devsoft.devopsmind.domain.exception.InvalidDomainStateException;
 
+@Tag("unitTest")
 @DisplayName("🧪 Pruebas Unitarias del Dominio :: Observabilidad e Incidentes con IA")
-class LabIncidentTest {
+class LabIncidentUTest {
 
     @Test
     @DisplayName("📌 Regla 3: ServerMetrics debería alertar correctamente cuando la RAM supera el umbral crítico")
@@ -64,4 +66,6 @@ class LabIncidentTest {
 
         assertThrows(InvalidDomainStateException.class, () -> incident.attachDiagnosis(plan));
     }
+
+    
 }

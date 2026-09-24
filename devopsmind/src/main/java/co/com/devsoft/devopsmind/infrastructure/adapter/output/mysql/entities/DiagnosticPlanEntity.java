@@ -26,7 +26,7 @@ public class DiagnosticPlanEntity {
     private String analysisConclusion;
 
     @Column(name = "steps_to_solve", nullable = false, columnDefinition = "JSON")
-    private String stepsToSolve; // 🎯 Guardamos la estructura List<String> como JSON en crudo stringificado
+    private String stepsToSolve;
 
     @Column(name = "requires_kernel_reboot", nullable = false)
     private boolean requiresKernelReboot;
@@ -34,7 +34,6 @@ public class DiagnosticPlanEntity {
     public DiagnosticPlanEntity() {
     }
 
-    // Getters y Setters estándar
     public Long getId() {
         return id;
     }

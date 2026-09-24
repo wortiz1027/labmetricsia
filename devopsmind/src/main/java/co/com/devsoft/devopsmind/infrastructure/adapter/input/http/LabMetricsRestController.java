@@ -14,12 +14,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import co.com.devsoft.devopsmind.application.ports.input.AnalyzeIncidentUseCase;
+import co.com.devsoft.devopsmind.application.ports.input.FindIncidentByIdUseCase;
 import co.com.devsoft.devopsmind.application.ports.input.IndexManualUseCase;
+import co.com.devsoft.devopsmind.application.ports.input.SearchKnowledgeUseCase;
 import co.com.devsoft.devopsmind.domain.exception.ResourceNotFoundException;
-import co.com.devsoft.devopsmind.domain.model.LabIncident;
 import co.com.devsoft.devopsmind.domain.model.ManualId;
-import co.com.devsoft.devopsmind.domain.repository.LabIncidentStorage;
-import co.com.devsoft.devopsmind.domain.repository.TechnicalManualStorage;
 import co.com.devsoft.devopsmind.infrastructure.adapter.input.http.dto.IncidentReportRequest;
 import co.com.devsoft.devopsmind.infrastructure.adapter.input.http.dto.KnowledgeChunkResponse;
 import co.com.devsoft.devopsmind.infrastructure.adapter.input.http.dto.LabIncidentResponse;
@@ -32,69 +31,50 @@ public class LabMetricsRestController {
 
     private final IndexManualUseCase indexManualUseCase;
     private final AnalyzeIncidentUseCase analyzeIncidentUseCase;
-    private final LabIncidentStorage incidentStorage;
-    private final TechnicalManualStorage manualStorage;
+    private final FindIncidentByIdUseCase findIncidentByIdUseCase;
+    private final SearchKnowledgeUseCase searchKnowledgeUseCase;
 
     public LabMetricsRestController(IndexManualUseCase indexManualUseCase,
             AnalyzeIncidentUseCase analyzeIncidentUseCase,
-            LabIncidentStorage incidentStorage,
-            TechnicalManualStorage manualStorage) {
+            FindIncidentByIdUseCase findIncidentByIdUseCase,
+            SearchKnowledgeUseCase searchKnowledgeUseCase) {
         this.indexManualUseCase = indexManualUseCase;
         this.analyzeIncidentUseCase = analyzeIncidentUseCase;
-        this.incidentStorage = incidentStorage;
-        this.manualStorage = manualStorage;
+        this.findIncidentByIdUseCase = findIncidentByIdUseCase;
+        this.searchKnowledgeUseCase = searchKnowledgeUseCase;
     }
 
-    /**
-     * 🚀 MUTATION EQUIVALENTE: Indexa fragmentos semánticos de un manual vía POST.
-     */
     @PostMapping("/manuals/{manualId}/index")
-    public ResponseEntity<Void> indexManualText(
-            @PathVariable String manualId,
+    public ResponseEntity<Void> indexManualText(@PathVariable String manualId,
             @RequestBody ManualIndexRequest request) {
-
         indexManualUseCase.index(new ManualId(manualId), request.rawText(), request.sectionName());
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    /**
-     * 🚀 MUTATION EQUIVALENTE: Reporta un incidente, evalúa telemetría y genera
-     * diagnóstico vía IA.
-     */
     @PostMapping("/incidents")
     public ResponseEntity<LabIncidentResponse> reportIncident(@RequestBody IncidentReportRequest request) {
         var domainMetrics = RestMapper.toDomain(request.metrics());
-        LabIncident analyzedIncident = analyzeIncidentUseCase.analyze(request.errorDescription(), domainMetrics);
-        return ResponseEntity.status(HttpStatus.CREATED).body(RestMapper.toResponse(analyzedIncident));
+        var analyzed = analyzeIncidentUseCase.analyze(request.errorDescription(), domainMetrics);
+        return ResponseEntity.status(HttpStatus.CREATED).body(RestMapper.toResponse(analyzed));
     }
 
-    /**
-     * 🔍 QUERY EQUIVALENTE: Busca un incidente específico en la bitácora relacional
-     * de MySQL.
-     */
     @GetMapping("/incidents/{id}")
     public ResponseEntity<LabIncidentResponse> getIncidentById(@PathVariable String id) {
-        LabIncidentResponse response = incidentStorage.findBy(id)
+        var response = findIncidentByIdUseCase.findById(id)
                 .map(RestMapper::toResponse)
-                .orElseThrow(() -> new ResourceNotFoundException(String.format("El incidente con ID '%s' no existe en los registros de observabilidad.", id)
-                        ));
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "El incidente con ID '" + id + "' no existe en los registros de observabilidad."));
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * 🔍 QUERY EQUIVALENTE: Búsqueda semántica directa en pgvector RAG.
-     */
     @GetMapping("/knowledge/search")
-    public ResponseEntity<List<KnowledgeChunkResponse>> searchKnowledge(
-            @RequestParam String query,
+    public ResponseEntity<List<KnowledgeChunkResponse>> searchKnowledge(@RequestParam String query,
             @RequestParam(defaultValue = "3") int maxResults) {
-
-        List<KnowledgeChunkResponse> chunks = manualStorage.findRelevantChunks(query, maxResults).stream()
+        List<KnowledgeChunkResponse> chunks = searchKnowledgeUseCase.search(query, maxResults).stream()
                 .map(RestMapper::toResponse)
                 .filter(opt -> opt != null && opt.isPresent())
                 .map(opt -> opt.get())
                 .collect(Collectors.toList());
-
         return ResponseEntity.ok(chunks);
     }
 }

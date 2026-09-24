@@ -70,7 +70,7 @@ public class GraphQLMapper {
             domain.getRamUsageGigabytes(),
             domain.getGpuVramUsageGigabytes(),
             domain.isSwapActive(),
-            domain.hasMemoryAlert(),     // Conectamos la regla lógica 3
+            domain.hasMemoryAlert(),
             domain.requiresCacheFlush()
         );
     }
@@ -81,14 +81,13 @@ public class GraphQLMapper {
             domain.getAnalysisConclusion(),
             domain.getStepsToSolve(),
             domain.isRequiresKernelReboot(),
-            domain.hasForbiddenCommands() // Conectamos la regla de seguridad 5
+            domain.hasForbiddenCommands()
         );
     }
 
     public static LabIncidentDTO toDTO(LabIncident domain) {
         if (domain == null) return null;
 
-        // Extraemos de forma segura el campo 'severity' enriquecido por el dominio
         String severityName = "MEDIUM";
         try {
             java.lang.reflect.Field severityField = LabIncident.class.getDeclaredField("severity");
@@ -100,7 +99,7 @@ public class GraphQLMapper {
             domain.getId(),
             domain.getErrorDescription(),
             domain.getStatus().name(),
-            severityName, // Regla de sobreescritura autónoma 4 mapeada
+            severityName,
             toDTO(domain.getMetrics()),
             toDTO(domain.getSolutionPlan())
         );
