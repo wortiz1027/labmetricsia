@@ -41,40 +41,32 @@ get_build_revision() {
 # ==============================================================================
 get_build_version() {
     local latest_tag
-    # Buscamos el último tag que cumpla con el patrón v*.*.* (ej: v1.0.2)
     latest_tag=$(git describe --tags --abbrev=0 --match "v*.*.*" 2>/dev/null || echo "v0.0.0")
 
-    # Removemos la 'v' inicial si existe para procesar los números limpios
     local clean_version="${latest_tag#v}"
 
-    # Dividimos la versión actual en sus tres componentes: X.Y.Z
     local major; local minor; local patch
     IFS='.' read -r major minor patch <<< "${clean_version}"
 
-    # Definimos los flags de incremento
     local inc_major=false
     local inc_minor=false
     local inc_patch=false
 
-    # 🎯 Recuperamos todos los commits desde el último tag hasta el HEAD actual
     local commit_range
     if [ "${latest_tag}" = "v0.0.0" ]; then
-        commit_range="HEAD" # Si no hay tags previos, escanea toda la historia
+        commit_range="HEAD"
     else
         commit_range="${latest_tag}..HEAD"
     fi
 
-    # Leemos los mensajes de los commits en el rango seleccionado
     local commit_messages
     commit_messages=$(git log "${commit_range}" --format="%s" 2>/dev/null || echo "")
 
-    # Si no hay commits nuevos, mantenemos la versión actual del tag
     if [ -z "${commit_messages}" ]; then
         echo "${clean_version}"
         return
     fi
 
-    # 🕵️ ESCANEO DE CONVENTIONAL COMMITS:
     while IFS= read -r msg; do
         if [[ "${msg}" == *"BREAKING CHANGE"* || "${msg}" =~ ^[a-z]+\([a-z0-9_-]+\)!: || "${msg}" =~ ^[a-z]+!: ]]; then
             inc_major=true
@@ -85,7 +77,6 @@ get_build_version() {
         fi
     done <<< "${commit_messages}"
 
-    # 💥 APLICACIÓN DE PRIORIDAD MATEMÁTICA SEMVER:
     if [ "${inc_major}" = true ]; then
         major=$((major + 1))
         minor=0
@@ -96,12 +87,37 @@ get_build_version() {
     elif [ "${inc_patch}" = true ]; then
         patch=$((patch + 1))
     else
-        # Si los commits no siguen el estándar, aplicamos un patch de fallback por seguridad
         patch=$((patch + 1))
     fi
 
-    # Retornamos la nueva versión semántica calculada de forma pura
     echo "${major}.${minor}.${patch}"
+}
+
+# ==============================================================================
+# 🏷️ FUNCIÓN DE CREACIÓN DE TAG EN GIT (INTERACTIVA)
+# ==============================================================================
+ask_and_create_git_tag() {
+    local version=$1
+    local tag_name="v${version}"
+
+    # Verificamos si el tag físico ya existe en Git de forma preventiva
+    if git rev-parse "${tag_name}" >/dev/null 2>&1; then
+        log_warn "El tag de Git '${tag_name}' ya existe localmente. Omitiendo creación."
+        return
+    fi
+
+    echo -e "\n${CLR_YELLOW}❓ ¿Deseas crear y confirmar el Tag de Git [${tag_name}] para este build? (y/N):${CLR_RESET} "
+    # Leemos la respuesta del desarrollador (por defecto No si presiona Enter)
+    read -r response
+
+    if [[ "${response}" =~ ^([yY][eE][sS]|[yY])$ ]]; then
+        log_info "Creando Tag anotado en Git: ${tag_name}..."
+        git tag -a "${tag_name}" -m "Release automática de servidor MCP: ${tag_name} [SemVer Autónomo]"
+        log_success "¡Tag de Git '${tag_name}' creado con éxito localmente!"
+        log_info "Recuerda subir tus tags ejecutando: git push origin --tags"
+    else
+        log_warn "Operación de Tagging cancelada por el usuario."
+    fi
 }
 
 # ==============================================================================
@@ -118,7 +134,6 @@ execute_docker_build() {
     build_revision=$(get_build_revision)
     build_version=$(get_build_version)
 
-    # Definimos las variables de los nombres de etiquetas de Docker Hub
     local target_tag_version="${REGISTRY_USER}/${IMAGE_NAME}:${build_version}"
     local target_tag_revision="${REGISTRY_USER}/${IMAGE_NAME}:${build_revision}"
     local target_tag_latest="${REGISTRY_USER}/${IMAGE_NAME}:latest"
@@ -146,6 +161,10 @@ execute_docker_build() {
       -t "${target_tag_latest}" .
 
     log_success "¡Imagen Docker compilada exitosamente con todos sus metadatos!"
+
+    # 🎯 CONTROL INTERACTIVO DE TAGGING:
+    # Invocamos la función pasándole la versión SemVer calculada dinámicamente
+    ask_and_create_git_tag "${build_version}"
 }
 
 # ==============================================================================

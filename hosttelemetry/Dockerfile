@@ -21,21 +21,19 @@
 FROM eclipse-temurin:25-jdk AS builder
 WORKDIR /build
 
-# Copiar el archivo de definición de dependencias y el wrapper de Maven
 COPY .mvn/ .mvn/
 COPY mvnw pom.xml ./
 
-# Descargar dependencias en caché para acelerar construcciones futuras
 RUN ./mvnw dependency:go-offline -B || true
 
-# Copiar el código fuente y empaquetar aplicando el perfil 'prod' de Maven
 COPY src/ src/
-#RUN ./mvnw clean package -DskipTests -B -Pprod
 RUN ./mvnw clean package -DskipTests
 
-# 🚀 ESTRATEGIA DE EXTRACCIÓN INFALIBLE: Descomprimir el JAR nativamente para crear las capas
-WORKDIR /build/extracted
-RUN jar -xf /build/target/*.jar
+RUN mkdir -p extracted
+ARG JAR_FILE=target/*.jar
+COPY ${JAR_FILE} application.jar
+
+RUN java -Djarmode=tools -jar application.jar extract --layers --destination extracted
 
 # ==========================================
 # FASE 2: Entorno de Ejecución (Runtime Stage)
@@ -43,7 +41,6 @@ RUN jar -xf /build/target/*.jar
 FROM eclipse-temurin:25-jre-alpine AS runner
 WORKDIR /app
 
-# 1. Crear un usuario de sistema sin shell interactiva para mitigar exploits de terminal
 RUN addgroup -S spring && \
     adduser -S spring -G spring -h /app -s /sbin/nologin && \
     mkdir -p /app/logs && \
@@ -56,7 +53,6 @@ ARG BUILD_DATE
 ARG BUILD_VERSION
 ARG BUILD_REVISION
 
-# Informacion de la persona que mantiene la imagen
 LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.authors="@DevSoft Team" \
     org.opencontainers.image.url="https://github.com/wortiz1027/labmetricsia/blob/main/Dockerfile" \
@@ -69,13 +65,13 @@ LABEL org.opencontainers.image.created=$BUILD_DATE \
     org.opencontainers.image.title="Mcp Server para la gestion de spring ia" \
     org.opencontainers.image.description="Componente encargado de gestionar la informacion de consultas de detalles de maquinas"
 
-# Copia eficiente de las dependencias y clases descomprimidas
-COPY --from=builder /build/extracted/BOOT-INF/lib /app/lib
-COPY --from=builder /build/extracted/META-INF /app/META-INF
-COPY --from=builder /build/extracted/BOOT-INF/classes /app
+COPY --from=builder /build/extracted/dependencies/ ./
+COPY --from=builder /build/extracted/spring-boot-loader/ ./
+COPY --from=builder /build/extracted/snapshot-dependencies/ ./
+COPY --from=builder /build/extracted/application/ ./
 
-ENV JAVA_OPTS="-XX:+UseZGC -XX:+ZGenerational -XX:+UnlockDiagnosticVMOptions -Dfile.encoding=UTF-8 -XX:+AlwaysPreTouch -Xss256k"
+ENV JAVA_OPTS="-XX:+UseZGC -Dfile.encoding=UTF-8 -XX:+AlwaysPreTouch -Xss256k"
 
-EXPOSE 8081
+EXPOSE 8079
 
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS org.springframework.boot.loader.launch.JarLauncher"]
+ENTRYPOINT ["java", "-jar", "application.jar"]

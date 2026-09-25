@@ -1,5 +1,5 @@
 server:
-  port: 8081 #
+  port: 8079 #
 
 spring:
   application:
@@ -23,4 +23,4 @@ spring:
 
 logging:
   file:
-    name: ./logs/mcp-server-host-telemetry.log
+    name: ${BASE_LOGS_DIR:/tmp}/mcp-server-host-telemetry.log
