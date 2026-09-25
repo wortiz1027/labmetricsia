@@ -9,10 +9,18 @@ spring:
   ai:
     mcp:
       server:
-        name: mcp-server
-        version: 0.0.1
         protocol: STREAMABLE
+        name: mcp-server-host-telemetry
+        version: 1.0.0
+        type: SYNC
+        instructions: "This streamable server provides real-detail host telemetry"
+        resource-change-notification: true
+        tool-change-notification: true
+        prompt-change-notification: true
+        streamable-http:
+          mcp-endpoint: /api/mcp
+          keep-alive-interval: 30s
 
 logging:
   file:
-    name: /tmp/logs/spring-boot-ai-mcp-server.log
+    name: ./logs/mcp-server-host-telemetry.log
