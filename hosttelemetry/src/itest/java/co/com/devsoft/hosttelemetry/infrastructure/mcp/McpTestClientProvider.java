@@ -1,15 +1,13 @@
 package co.com.devsoft.hosttelemetry.infrastructure.mcp;
 
+import java.net.http.HttpClient;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import io.modelcontextprotocol.client.McpClient;
 import io.modelcontextprotocol.client.McpSyncClient;
-import io.modelcontextprotocol.client.transport.HttpClientSseClientTransport;
 import io.modelcontextprotocol.client.transport.HttpClientStreamableHttpTransport;
-
-import java.net.http.HttpClient;
 
 @Component
 public class McpTestClientProvider {
@@ -30,19 +28,12 @@ public class McpTestClientProvider {
 
         return switch (resolvedProtocol) {
 
-            case "sse" -> McpClient.sync(
-                    HttpClientSseClientTransport.builder(baseUrl)
-                            .clientBuilder(clientBuilder)
-                            .sseEndpoint("/sse")
-                            .build()
-            ).build();
-
             case "streamable" -> McpClient.sync(
                     HttpClientStreamableHttpTransport.builder(baseUrl)
                             .clientBuilder(clientBuilder)
                             .endpoint("/mcp") // Ruta estandarizada por Spring AI
-                            .build()
-            ).build();
+                            .build())
+                    .build();
 
             default -> throw new IllegalArgumentException(String.format("%s%s",
                     "Unrecognized MCP protocol: ", protocol));
