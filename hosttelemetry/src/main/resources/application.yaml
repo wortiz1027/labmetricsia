@@ -18,7 +18,7 @@ spring:
         tool-change-notification: true
         prompt-change-notification: true
         streamable-http:
-          mcp-endpoint: /api/mcp
+          mcp-endpoint: /mcp
           keep-alive-interval: 30s
 
 logging:
