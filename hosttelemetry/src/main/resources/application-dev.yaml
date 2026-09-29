@@ -1,10 +1,7 @@
+server:
+  port: 8081 #
+
 spring:
-  application:
-    name: mcp-server
-  profiles:
-    active: '@spring.profiles.active@'
-  main:
-    banner-mode: off
   ai:
     mcp:
       server:
@@ -19,7 +16,3 @@ spring:
         streamable-http:
           mcp-endpoint: /mcp
           keep-alive-interval: 30s
-
-logging:
-  file:
-    name: ${BASE_LOGS_DIR:/tmp}/mcp-server-host-telemetry.log

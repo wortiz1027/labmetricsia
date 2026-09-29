@@ -5,7 +5,7 @@ name: labmetrics-mcp-validation
 
 services:
   mcp-server-telemetry:
-    image: wortiz1027/mcp-server-host-telemetry:latest
+    image: wortiz1027/mcp-server-host-telemetry:0.1.1
     container_name: mcp-server-host-telemetry-container
     restart: on-failure
     ports:
