@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.stereotype.Component;
 
 import co.com.devsoft.devopsmind.domain.model.DiagnosticPlan;
@@ -18,7 +19,12 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
     private final ChatClient chatClient;
 
-    public DiagnosticSpringAiAdapter(ChatClient.Builder chatClientBuilder, ChatMemory chatMemory) {
+    public DiagnosticSpringAiAdapter(ChatClient.Builder chatClientBuilder, ChatMemory chatMemory,
+            SyncMcpToolCallbackProvider telemetryToolsProvider) {
+        Object[] tools = (telemetryToolsProvider != null && telemetryToolsProvider.getToolCallbacks() != null)
+                ? (Object[]) telemetryToolsProvider.getToolCallbacks()
+                : new Object[0];
+
         this.chatClient = chatClientBuilder.defaultSystem("""
                 Eres un Ingeniero DevOps SRE experto en el laboratorio LabMetricsIA.
                 Tu misión es analizar la descripción de un error y las métricas de hardware actuales,
@@ -27,6 +33,7 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
                 CONCLUSION_DEL_ANALISIS | PASO_1, PASO_2, PASO_3 | REQUIERE_REBOOT_KERNEL(true/false)
                 """)
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
+                .defaultTools(tools)
                 .build();
     }
 
@@ -58,7 +65,8 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
             String[] parts = response.split("\\|");
             String conclusion = parts[0].trim();
             List<String> steps = Arrays.stream(parts[1].split(","))
-                    .map(String::trim)
+                    // .map(String::trim)
+                    .map(s -> s.trim())
                     .collect(Collectors.toList());
 
             boolean reboot = Boolean.parseBoolean(parts[2].trim());

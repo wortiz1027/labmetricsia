@@ -1,16 +1,19 @@
 package co.com.devsoft.devopsmind.it.shared.containers;
 
 import org.springframework.test.context.DynamicPropertyRegistry;
+import org.testcontainers.containers.Network;
 import org.testcontainers.mysql.MySQLContainer;
 import org.testcontainers.utility.DockerImageName;
 
 public class MySQLManagedContainer implements ManagedContainer {
 
     private final MySQLContainer MYSQL;
+    private final String NETWORK_ALIAS = "ntw_ai_itest";
+    private final String CONTAINER_IMAGE_NAME = "mysql:9.7.2";
 
     @SuppressWarnings("resource")
     public MySQLManagedContainer() {
-        MYSQL = new MySQLContainer(DockerImageName.parse("mysql:9.7.2"))
+        MYSQL = new MySQLContainer(DockerImageName.parse(CONTAINER_IMAGE_NAME))
                 .withDatabaseName("labmetricsia_test_db")
                 .withUsername("devops_user")
                 .withPassword("devops_pass")
@@ -20,9 +23,13 @@ public class MySQLManagedContainer implements ManagedContainer {
     }
 
     @Override
-    public void start() {
-        if (!MYSQL.isRunning())
+    public void start(Network network) {
+        if (!MYSQL.isRunning()) {
+            MYSQL.withNetwork(network)
+                    .withNetworkAliases(NETWORK_ALIAS);
+
             MYSQL.start();
+        }
     }
 
     @Override

@@ -27,11 +27,6 @@ public class TechnicalManualUTest {
     @Test
     @DisplayName("📌 Regla 2: Debería segmentar el texto y aceptar solo chunks con suficiente densidad de datos")
     void shouldSplitTextAndAcceptOnlyDescriptiveChunks() {
-        //String template = """
-        //        --- SECTION :: %s ---
-        //            Content: %s
-        //        """;
-        final String SECTION = "K8S_DEPLOY";
         TechnicalManual manual = new TechnicalManual(ManualId.generate(), "Manual de Kubernetes");
         String rawText = "Este es un párrafo de configuración avanzado para desplegar pods de alta disponibilidad usando arquitecturas de réplicas en nodos distribuidos.\n\nCorto.";
 
@@ -40,8 +35,6 @@ public class TechnicalManualUTest {
         assertEquals(1, chunks.size());
         assertEquals("K8S_DEPLOY", chunks.get(0).getSectionName());
         assertTrue(chunks.get(0).getTokenCountEstimate() >= 15);
-        // assertTrue(chunks.get(0).formatForContext().contains(String.format(template,
-        // SECTION, rawText)));
     }
 
     @Test

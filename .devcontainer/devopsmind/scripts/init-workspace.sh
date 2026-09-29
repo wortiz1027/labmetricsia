@@ -16,7 +16,7 @@ export PATH="$HOME/.local/bin:$PATH"
 if ! command -v mise &> /dev/null; then
     exit 0
 fi
-cd /workspaces
+
 mise run lint
 EOF
 chmod +x /workspaces/.git/hooks/pre-commit

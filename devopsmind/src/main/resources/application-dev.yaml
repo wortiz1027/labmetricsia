@@ -65,6 +65,15 @@ spring:
         index-type: HNSW
         distance-type: COSINE_DISTANCE
         dimensions: 1536
+    mcp:
+      client:
+        name: mcp-client-hot-telemetry
+        version: 1.0.0
+        streamable-http:
+          connections:
+            mcp-server-host-telemetry:
+              #url: http://${MCP_SERVER_HOSTNAME}:${MCP_SERVER_PORT}/api/mcp
+              url: http://hosttelemetry:8081/api/mcp
 
     ollama:
       base-url: http://${OLLAMA_SERVER_HOSTNAME:localhost}:11434

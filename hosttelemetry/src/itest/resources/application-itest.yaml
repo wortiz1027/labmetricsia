@@ -1,0 +1,18 @@
+server:
+  port: 8083 #
+
+spring:
+  application:
+    name: mcp-server
+  main:
+    banner-mode: off
+  ai:
+    mcp:
+      server:
+        name: mcp-server
+        version: 0.0.1
+        protocol: STREAMABLE
+
+logging:
+  file:
+    name: /tmp/logs/spring-boot-ai-mcp-server.log

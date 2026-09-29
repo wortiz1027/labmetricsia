@@ -1,0 +1,22 @@
+# ==============================================================================
+# 📊 CLÚSTER DE VALIDACIÓN DE INFRAESTRUCTURA MCP (LABMETRICSIA)
+# ==============================================================================
+name: labmetrics-mcp-validation
+
+services:
+  mcp-server-telemetry:
+    image: wortiz1027/mcp-server-host-telemetry:0.1.1
+    container_name: mcp-server-host-telemetry-container
+    restart: on-failure
+    ports:
+      - "8079:8079"
+    environment:
+      - TZ=America/Bogota
+      - BASE_LOGS_DIR=/app/logs
+    #volumes:
+    #  - ./logs:/app/logs
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 512M
