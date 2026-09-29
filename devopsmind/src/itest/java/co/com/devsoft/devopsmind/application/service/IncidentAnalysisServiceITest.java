@@ -3,12 +3,16 @@ package co.com.devsoft.devopsmind.application.service;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
+import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.test.context.TestConstructor;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 import co.com.devsoft.devopsmind.application.ports.input.AnalyzeIncidentUseCase;
 import co.com.devsoft.devopsmind.domain.model.LabIncident;
@@ -19,6 +23,9 @@ import co.com.devsoft.devopsmind.infrastructure.BaseIntegrationITest;
 @DisplayName("🧪 Pruebas de Integración :: Flujo Cognitivo SRE (Ollama + MongoDB Chat Memory)")
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class IncidentAnalysisServiceITest extends BaseIntegrationITest {
+
+    @MockitoBean
+    private SyncMcpToolCallbackProvider telemetryToolsProvider;
 
     private final AnalyzeIncidentUseCase analyzeIncidentUseCase;
 
@@ -42,5 +49,6 @@ class IncidentAnalysisServiceITest extends BaseIntegrationITest {
         assertNotNull(result.getSolutionPlan(), "Ollama debió responder y el adaptador parsear el plan estructurado.");
         assertFalse(result.getSolutionPlan().getStepsToSolve().isEmpty(),
                 "El plan debe contener los comandos de mitigación.");
+        verify(telemetryToolsProvider, times(1)).getToolCallbacks();
     }
 }

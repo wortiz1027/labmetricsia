@@ -18,6 +18,14 @@ spring:
     vectorstore:
       pgvector:
         initialize-schema: false
+    mcp:
+      client:
+        name: mcp-client-host-telemetry
+        version: 1.0.0
+        streamable-http:
+          connections:
+            mcp-server-host-telemetry:
+              url: http://${MCP_SERVER_HOSTNAME}:${MCP_SERVER_PORT}
 
   storages:
     providers:

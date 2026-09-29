@@ -44,7 +44,8 @@ public class IncidentAnalysisService implements AnalyzeIncidentUseCase {
         List<KnowledgeChunk> contextChunks = this.manualStorage.findRelevantChunks(errorDescription, 3);
 
         String formattedContext = contextChunks.stream()
-                .map(KnowledgeChunk::formatForContext)
+                // .map(KnowledgeChunk::formatForContext)
+                .map(chunk -> String.format("📄 [%s] %s", chunk.getSectionName(), chunk.getContent()))
                 .collect(Collectors.joining("\n"));
 
         log.info("🤖 [Servicio Aplicación] Solicitando diagnóstico al motor cognitivo de Ollama...");
