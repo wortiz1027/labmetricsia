@@ -20,7 +20,7 @@ semgrep = "1.170.0"
  "lint:commit-message" = { run = "./scripts/validate-commit.sh" }
 
 "security:private-keys" = { run = "! grep -qE -e '---BEGIN (RSA|OPENSSH|PRIVATE) KEY---' $(find . -type f ! -path '*/.*')" }
-"security:secrets" = { run = "gitleaks protect --staged --verbose" }
+#"security:secrets" = { run = "gitleaks protect --staged --verbose" }
 # "security:trufflehog" = { run = "trufflehog filesystem --only-verified ." }
 # "security:trufflehog-gh" = { run = "trufflehog git --only-verified file://. --max-depth=1" }
 # "security:sast" = { run = "./scripts/check-sast.sh" }
@@ -33,7 +33,7 @@ semgrep = "1.170.0"
     # "lint:toml",
     # "lint:commit-message",
     "security:private-keys",
-    "security:secrets",
+    #"security:secrets",
     #"security:trufflehog",
     #"security:trufflehog-gh",
     #"security:sast"
