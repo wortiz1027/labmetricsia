@@ -1,0 +1,25 @@
+global:
+  scrape_interval: 120s
+  evaluation_interval: 120s
+
+scrape_configs:
+  - job_name: 'prometheus'
+    scrape_interval: 5s
+    static_configs:
+      - targets: ['localhost:9090']
+
+  - job_name: 'srv-devopsmind'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: ['service-devopsmind:9084']
+        labels:
+          application: 'srv-devopsmind'
+
+  - job_name: 'srv-hosttelemetry'
+    metrics_path: '/actuator/prometheus'
+    scrape_interval: 2s
+    static_configs:
+      - targets: ['service-hosttelemetry:9085']
+        labels:
+          application: 'srv-hosttelemetry'
