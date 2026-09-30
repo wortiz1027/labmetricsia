@@ -4,6 +4,21 @@
 spring:
   main:
     allow-bean-definition-overriding: true
+  cloud:
+    vault:
+      uri: http://${SECRET_MANAGER_HOSTNAME:srv-secret-manage}:${SECRET_MANAGER_PORT:8200}
+      authentication: TOKEN
+      token: ${TOKEN_SECRET_MANAGER}
+      kv:
+        enabled: true
+        backend: secret
+        default-context: "kv/devopsmind"
+        profile-separator: '/'
+      fail-fast: true
+      connection-timeout: 5000
+      read-timeout: 15000
+  config:
+    import: vault://
   data:
     mongodb:
       auto-index-creation: true

@@ -16,6 +16,7 @@ import co.com.devsoft.devopsmind.it.shared.containers.ManagedContainer;
 import co.com.devsoft.devopsmind.it.shared.containers.MongoDBManagedContainer;
 import co.com.devsoft.devopsmind.it.shared.containers.MySQLManagedContainer;
 import co.com.devsoft.devopsmind.it.shared.containers.OllamaManagedContainer;
+import co.com.devsoft.devopsmind.it.shared.containers.OpenBaoManagedContainer;
 import co.com.devsoft.devopsmind.it.shared.containers.PostgreSQLManagedContainer;
 
 @Tags({
@@ -32,7 +33,8 @@ public abstract class BaseIntegrationITest {
             new PostgreSQLManagedContainer(),
             new MongoDBManagedContainer(),
             new OllamaManagedContainer(),
-            new HostTelemetryManagedContainer());
+            new HostTelemetryManagedContainer(),
+            new OpenBaoManagedContainer());
     static {
         CONTAINERS.forEach(container -> container.start(SHARED_NETWORK));
 
