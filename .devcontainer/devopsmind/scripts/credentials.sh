@@ -36,6 +36,12 @@ VAULT_DB_MONGO_INITIAL_DB=$(gopass show -o ai/database/mongo/database)
 VAULT_DB_MONGOEX_ADMIN_USERNAME=$(gopass show -o ai/database/mongoex/username)
 VAULT_DB_MONGOEX_ADMIN_PASSWROD=$(gopass show -o ai/database/mongoex/password)
 
+VAULT_AUTH_KEYCLOAK_ADMIN_USERNAME=$(gopass show -o ai/auth/keycloak/admin-username)
+VAULT_AUTH_KEYCLOAK_ADMIN_PASSWORD=$(gopass show -o ai/auth/keycloak/admin-password)
+
+VAULT_METRICS_GRAFANA_ADMIN_USERNAME=$(gopass show -o ai/metrics/grafana/username)
+VAULT_METRICS_GRAFANA_ADMIN_PASSWORD=$(gopass show -o ai/metrics/grafana/password)
+
 if ! command -v gopass &> /dev/null; then
     echo "❌ Error: gopass is not installed in the host machine." >&2
     return 1
@@ -66,5 +72,11 @@ export DB_MONGO_HOSTNAME=$(gopass show -o $VAULT_DB_MONGO_HOSTNAME)
 export DB_MONGO_INITIAL_DB=$(gopass show -o $VAULT_DB_MONGO_INITIAL_DB)
 export DB_MONGOEX_ADMIN_USERNAME=$(gopass show -o $VAULT_DB_MONGOEX_ADMIN_USERNAME)
 export DB_MONGOEX_ADMIN_PASSWROD=$(gopass show -o $VAULT_DB_MONGOEX_ADMIN_PASSWROD)
+
+export AUTH_KEYCLOAK_ADMIN_USERNAME=$(gopass show -o $VAULT_AUTH_KEYCLOAK_ADMIN_USERNAME)
+export AUTH_KEYCLOAK_ADMIN_PASSWORD=$(gopass show -o $VAULT_AUTH_KEYCLOAK_ADMIN_PASSWORD)
+
+export METRICS_GRAFANA_ADMIN_USERNAME=$(gopass show -o $VAULT_METRICS_GRAFANA_ADMIN_USERNAME)
+export METRICS_GRAFANA_ADMIN_PASSWORD=$(gopass show -o $VAULT_METRICS_GRAFANA_ADMIN_PASSWORD)
 
 echo "✅ Variables [DB_USERNAME, DB_PASSWORD, DB_HOSTNAME, DB_NAME, DB_SCHEMA, API_SECRET_KEY] have been loaded succesfully in terminal environment..."

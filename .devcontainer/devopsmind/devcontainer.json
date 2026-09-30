@@ -2,13 +2,26 @@
 	"name": "🍃 LabMetricsIA :: DevOpsMind Backend 🍃",
 	"service": "devopsmind",
 	"dockerComposeFile": "./containers/compose.yaml",
+	"runArgs": [
+		"--security-opt",
+		"label=disable",
+		"--network=ntw_ai",
+		"--env-file"
+	],
   	"runServices": [
 		"mysql",
 		"phpmyadmin",
 		"postgres-pgvector",
 		"pgadmin",
 		"mongo",
-		"mongo-express"
+		"mongo-express",
+		"vault",
+		"keycloak",
+		"alloy",
+		"tempo",
+		"prometheus",
+		"loki",
+		"grafana"
 	],
   	"hostRequirements": {
 		"cpus": 2,
@@ -17,7 +30,7 @@
 		"gpu": false
 	},
 	"features": {
-		"ghcr.io/devcontainers/features/common-utils:2.6.0": {
+		"ghcr.io/devcontainers/features/common-utils:2.7.0": {
 			"installZsh": true,
 			"configureZshAsDefaultShell": true,
 			"installOhMyZsh": true,
@@ -29,7 +42,7 @@
 			"plugins": "zsh-autosuggestions zsh-syntax-highlighting",
 			"omzPlugins": "https://github.com/zsh-users/zsh-autosuggestions.git https://github.com/zsh-users/zsh-syntax-highlighting.git"
 		},
-		"ghcr.io/devcontainers/features/docker-in-docker:4.1.1": {
+		"ghcr.io/devcontainers/features/docker-in-docker:4.1.2": {
 			"moby": "false"
 		}
 	},
@@ -111,7 +124,16 @@
 		8081,
 		8082,
 		8083,
-		8200
+		8200,
+		8089,
+		4317,
+		4318,
+		12345,
+		3200,
+		9090,
+		3100,
+		3001,
+		9084
 	],
 	"portsAttributes": {
 		"8080": { "label": "Servidor Web Java Backend", "onAutoForward": "notify" },
@@ -122,17 +144,20 @@
 		"8081": { "label": "Servidor PhpMyAdmin", "onAutoForward": "notify" },
 		"8082": { "label": "Servidor PgAdmin", "onAutoForward": "notify" },
 		"8083": { "label": "Servidor Mongo Express", "onAutoForward": "notify" },
-		"8200": { "label": "Servidor Secret Manager", "onAutoForward": "notify" }
+		"8200": { "label": "Servidor Secret Manager", "onAutoForward": "notify" },
+		"8089": { "label": "Servidor Autenticacion keycloak", "onAutoForward": "notify" },
+		"4317": { "label": "Servidor grpc metrics", "onAutoForward": "notify" },
+		"4318": { "label": "Servidor http metrics", "onAutoForward": "notify" },
+		"12345": { "label": "Servidor --", "onAutoForward": "notify" },
+		"3200": { "label": "Servidor Tempo UI", "onAutoForward": "notify" },
+		"9090": { "label": "Servidor Prometheus", "onAutoForward": "notify" },
+		"3100": { "label": "Servidor loki", "onAutoForward": "notify" },
+		"3001": { "label": "Servidor Grafana", "onAutoForward": "notify" },
+		"9084": { "label": "Servidor metricas actuator", "onAutoForward": "notify" }
 	},
 	"mounts": [
 		"source=${localEnv:HOME}/.dotfiles/git/.gitconfig,target=/home/vscode/.gitconfig,type=bind,consistency=cached",
-		"source=${localEnv:HOME}/.dotfiles/git/commit.template,target=/home/vscode/.config/git/commit.template,type=bind,consistency=cached",
-	],
-	"runArgs": [
-		"--security-opt",
-		"label=disable",
-		"--network=ntw_ai",
-		"--env-file"
+		"source=${localEnv:HOME}/.dotfiles/git/commit.template,target=/home/vscode/.config/git/commit.template,type=bind,consistency=cached"
 	],
 	"remoteEnv": {
 		"MISE_TRUSTED_CONFIG_PATHS": "/workspaces",
@@ -146,5 +171,4 @@
 	"postStartCommand": "rm -f ./.devcontainer/devopsmind/containers/.env",		
 	"containerUser": "vscode",
 	"remoteUser": "vscode"
-
 }
