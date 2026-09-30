@@ -4,10 +4,14 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.client.advisor.MessageChatMemoryAdvisor;
 import org.springframework.ai.chat.memory.ChatMemory;
 import org.springframework.ai.mcp.SyncMcpToolCallbackProvider;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
 import co.com.devsoft.devopsmind.domain.model.DiagnosticPlan;
@@ -17,6 +21,17 @@ import co.com.devsoft.devopsmind.domain.repository.DiagnosticEngineAi;
 @Component
 public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
+    private static final Logger log = LoggerFactory.getLogger(DiagnosticSpringAiAdapter.class);
+
+    @Value("${spring.profiles.active:dev}")
+    private String activeProfile;
+
+    @Value("classpath:/prompts/system-sre-agent.st")
+    private Resource systemPromptResource;
+
+    @Value("classpath:/prompts/user-sre-task.st")
+    private Resource userPromptResource;
+
     private final ChatClient chatClient;
 
     public DiagnosticSpringAiAdapter(ChatClient.Builder chatClientBuilder, ChatMemory chatMemory,
@@ -25,13 +40,7 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
                 ? (Object[]) telemetryToolsProvider.getToolCallbacks()
                 : new Object[0];
 
-        this.chatClient = chatClientBuilder.defaultSystem("""
-                Eres un Ingeniero DevOps SRE experto en el laboratorio LabMetricsIA.
-                Tu misión es analizar la descripción de un error y las métricas de hardware actuales,
-                utilizar el contexto técnico provisto de los manuales y devolver un plan de diagnóstico estructurado.
-                Debes responder estrictamente en el siguiente formato separado por la palabra '|':
-                CONCLUSION_DEL_ANALISIS | PASO_1, PASO_2, PASO_3 | REQUIERE_REBOOT_KERNEL(true/false)
-                """)
+        this.chatClient = chatClientBuilder
                 .defaultAdvisors(MessageChatMemoryAdvisor.builder(chatMemory).build())
                 .defaultTools(tools)
                 .build();
@@ -39,20 +48,23 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
     @Override
     public DiagnosticPlan generatePlan(String errorDescription, ServerMetrics metrics, String formattedContext) {
-        String template = """
-                CONTEXTO DE MANUALES TÉCNICOS: %s
-                DETALLES DEL FALLO ACTUAL:
-                    - Error: %s
-                    - Uso CPU: %.2f%%
-                    - RAM Usada: %.2f GB
-                Por favor, genera la conclusión, los comandos específicos de solución y evalúa si requiere reiniciar.
-                """;
+        log.info("🤖 [AI Adapter] Lanzando tubería cognitiva con renderizado de plantillas .st unificadas...");
 
-        String promptUser = String.format(template, formattedContext, errorDescription,
-                metrics.getCpuUsagePercentage(), metrics.getRamUsageGigabytes());
+        String currentEnv = (activeProfile != null) ? activeProfile.toUpperCase() : "DEVELOPMENT";
 
         String rawAiResponse = chatClient.prompt()
-                .user(promptUser)
+                .system(systemSpec -> systemSpec
+                        .text(systemPromptResource)
+                        .param("environment", currentEnv) // Llena {environment} en system-sre-agent.st
+                        .param("maxSteps", 3) // Llena {maxSteps} en system-sre-agent.st
+                )
+                .user(userSpec -> userSpec
+                        .text(userPromptResource) // 🎯 Carga los placeholders dinámicos
+                        .param("error", errorDescription) // Fills {error}
+                        .param("cpu", metrics.getCpuUsagePercentage()) // Fills {cpu}
+                        .param("ram", metrics.getRamUsageGigabytes()) // Fills {ram}
+                        .param("context", formattedContext) // Fills {context}
+                )
                 .advisors(a -> a.param("chat_memory_conversation_id", "LAB-SRE-CONVERSATION-THREAD"))
                 .call()
                 .content();
@@ -62,10 +74,14 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
     private DiagnosticPlan parseAIResponse(String response) {
         try {
-            String[] parts = response.split("\\|");
+            if (response == null)
+                throw new IllegalArgumentException("La respuesta del LLM es nula.");
+
+            String cleanResponse = response.replaceAll("\\n", "").trim();
+            String[] parts = cleanResponse.split("\\|");
+
             String conclusion = parts[0].trim();
             List<String> steps = Arrays.stream(parts[1].split(","))
-                    // .map(String::trim)
                     .map(s -> s.trim())
                     .collect(Collectors.toList());
 
@@ -73,6 +89,7 @@ public class DiagnosticSpringAiAdapter implements DiagnosticEngineAi {
 
             return new DiagnosticPlan(conclusion, steps, reboot);
         } catch (Exception e) {
+            log.warn("⚠️ [AI Adapter] Error de parseo en el modelo de 3B. Ejecutando plan de fallback.");
             return new DiagnosticPlan("Mitigación de contingencia: No se pudo parsear el formato estructurado del LLM.",
                     List.of("Verificar estado de sockets", "Ejecutar docker service restart"),
                     Boolean.FALSE);
