@@ -96,11 +96,13 @@
 	},
 	"forwardPorts": [
 		8081,
-		8079
+		8079,
+		9085
 	],
 	"portsAttributes": {
 		"8081": { "label": "Servidor Web Java Backend(profile: dev)", "onAutoForward": "notify" },
-		"8079": { "label": "Servidor Web Java Backend(profile: prod)", "onAutoForward": "notify" }
+		"8079": { "label": "Servidor Web Java Backend(profile: prod)", "onAutoForward": "notify" },
+		"9085": { "label": "Servidor Metricas Actuator", "onAutoForward": "notify" }
 	},
 	"mounts": [
 		"source=${localEnv:HOME}/.local/share/gopass,target=${containerWorkspaceFolder}/../.local/share/gopass,type=bind,consistency=cached",

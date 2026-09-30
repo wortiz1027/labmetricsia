@@ -1,0 +1,116 @@
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+// ==========================================
+// SECCIÓN DE LOGS (LOKI) - Tu config intacta
+// ==========================================
+
+// 1. Monitorear de forma dinámica todas las subcarpetas de logs
+local.file_match "devopsmind_logs" {
+    path_targets = [
+        // 🚀 TARGET 1: Servicio de Usuarios
+        {
+            __address__  = "localhost",
+            __path__     = "/var/log/spring/devopsmind/*.log",
+            app          = "devopsmind",
+            service_name = "devopsmind",
+        },
+        // 🚀 TARGET 2: Servicio de Productos
+        //{
+        //    __address__  = "localhost",
+        //    __path__     = "/var/log/spring/products/*.log",
+        //    app          = "products",
+        //    service_name = "products",
+        //},
+    ]
+}
+
+// 2. Leer los archivos encontrados en tiempo real
+loki.source.file "scraped_logs" {
+    targets    = local.file_match.devopsmind_logs.targets
+    forward_to = [loki.process.parse_json.receiver]
+    tail_from_end = true
+}
+
+// 3. Procesar las líneas JSON
+loki.process "parse_json" {    
+    stage.json {
+        expressions = { 
+            level = "level", 
+            logger = "logger",
+            application_name = "context",
+            environment = "environment",
+            app   = "app",
+        }
+    }
+    
+    stage.regex {
+        source      = "filename"
+        expression  = "/var/log/spring/(?P<extracted_app>[^/]+)/"
+    }
+
+    stage.labels {
+        values = {
+            level            = "level",            
+            application_name = "application_name", 
+            environment      = "environment",      
+            app              = "extracted_app",
+            service_name     = "extracted_app", 
+        }
+    }
+    forward_to = [loki.write.loki_backend.receiver]
+}
+
+// 4. Enviar hacia Loki
+loki.write "loki_backend" {
+    endpoint {
+        url = "http://srv-loki:3100/loki/api/v1/push"
+        tenant_id  = "default"
+        batch_wait = "1s"
+        batch_size = "1MB"
+    }
+}
+
+// ==========================================
+// 🚀 SECCIÓN DE TELEMETRÍA UNIFICADA (OTLP)
+// ==========================================
+
+// 5. RECEPTOR MODIFICADO: Ahora escucha tanto Trazas como Métricas de Spring Boot
+otelcol.receiver.otlp "spring_boot_telemetry" {
+  grpc {
+    endpoint = "0.0.0.0:4317"
+  }
+  http {
+    endpoint = "0.0.0.0:4318"
+  }
+
+  output {
+    traces  = [otelcol.exporter.otlp.send_to_tempo.input]
+    // 🌟 NUEVO: Envía las métricas recibidas al convertidor de Prometheus
+    metrics = [otelcol.exporter.prometheus.send_to_prometheus.input]
+  }
+}
+
+// 6. EXPORTADOR A TEMPO: Envía las trazas directamente a Grafana Tempo
+otelcol.exporter.otlp "send_to_tempo" {
+  client {
+    endpoint = "srv-tempo:4317"
+    tls {
+      insecure = true
+    }
+  }
+}
+
+// 7. 🌟 NUEVO CONVERTIDOR: Transforma el formato OTLP de Java en métricas de Prometheus
+otelcol.exporter.prometheus "send_to_prometheus" {
+  forward_to = [prometheus.remote_write.prometheus_backend.receiver]
+}
+
+// 8. 🌟 NUEVO EXPORTADOR A PROMETHEUS: Escribe los datos en tu contenedor de Prometheus
+prometheus.remote_write "prometheus_backend" {
+  endpoint {
+    url = "http://srv-prometheus:9090/api/v1/write"
+  }
+}

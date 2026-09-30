@@ -49,6 +49,12 @@ DB_MONGO_INITIAL_DB=$(gopass show -o ai/database/mongo/database)
 
 DB_MONGOEX_ADMIN_USERNAME=$(gopass show -o ai/database/mongoex/username)
 DB_MONGOEX_ADMIN_PASSWROD=$(gopass show -o ai/database/mongoex/password)
+
+AUTH_KEYCLOAK_ADMIN_USERNAME=$(gopass show -o ai/auth/keycloak/admin-username)
+AUTH_KEYCLOAK_ADMIN_PASSWORD=$(gopass show -o ai/auth/keycloak/admin-password)
+
+METRICS_GRAFANA_ADMIN_USERNAME=$(gopass show -o ai/metrics/grafana/username)
+METRICS_GRAFANA_ADMIN_PASSWORD=$(gopass show -o ai/metrics/grafana/password)
 EOF
 
 echo "✅ Archivos de secretos generados con éxito en el monorrepo y en /tmp/.env"

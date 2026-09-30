@@ -23,6 +23,7 @@ services:
   mysql:
     image: mysql:9.7.2
     container_name: srv-mysql
+    hostname: service-devopsmind    
     restart: unless-stopped
     environment:
       TZ: America/Bogota
@@ -148,12 +149,13 @@ services:
     ports:
       - "8200:8200"
     environment:
+      TZ: America/Bogota    
       BAO_DEV_ROOT_TOKEN_ID: ${TOKEN_SECRET_MANAGER}
       BAO_DEV_LISTEN_ADDRESS: 0.0.0.0:8200
       VAULT_ADDR: http://srv-secret-manager:8200
     volumes:
-      - ./openbao/config:/openbao/config
-      - ./openbao/data:/openbao/data
+      - ./configs/openbao/config:/openbao/config
+      - ./configs/openbao/data:/openbao/data
     networks:
       - ntw_ai
     healthcheck:
@@ -162,6 +164,103 @@ services:
       timeout: 5s
       retries: 5
       start_period: 5s
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:24.0
+    container_name: srv-keycloak
+    restart: always
+    command: start-dev
+    ports:
+      - "8089:8080"
+    environment:
+      - TZ=America/Bogota    
+      - KEYCLOAK_ADMIN=${AUTH_KEYCLOAK_ADMIN_USERNAME}
+      - KEYCLOAK_ADMIN_PASSWORD=${AUTH_KEYCLOAK_ADMIN_PASSWORD}
+      - KC_HEALTH_ENABLED=true
+    networks:
+      - ntw_ai
+    volumes:
+      - ./configs/keycloak/workshop-realm.json:/opt/keycloak/data/import/workshop-realm.json      
+    healthcheck:
+      test: ["CMD-SHELL", "exec 3<>/dev/tcp/127.0.0.1/8080 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\nConnection: close\r\n\r\n' >&3 && cat <&3 | grep -q '200 OK'"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+  alloy:
+    image: grafana/alloy:latest
+    container_name: srv-alloy
+    restart: always
+    ports:
+      - "4317:4317"
+      - "4318:4318"
+      - "12345:12345"
+    environment:
+      TZ: America/Bogota 
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+      - --stability.level=experimental
+    volumes:
+      - vlm_devopsmind_logs:/var/log/spring/devopsmind:ro
+      - ./configs/alloy/config.alloy:/etc/alloy/config.alloy:ro
+    networks:
+      - ntw_ai
+  tempo:
+    image: grafana/tempo:2.10.4
+    container_name: srv-tempo
+    restart: always    
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    environment:
+      TZ: America/Bogota     
+    volumes:
+      - ./configs/tempo/tempo.yaml:/etc/tempo.yaml:ro
+    ports:
+      - "3200:3200"   # Tempo UI/API
+    networks:
+      - ntw_ai 
+
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: srv-prometheus
+    ports:
+      - "9090:9090"
+    environment:
+      TZ: America/Bogota       
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+    volumes:
+      - ./configs/prometheus/prometheus.dev.yml:/etc/prometheus/prometheus.yml
+    networks:
+      - ntw_ai
+  loki:
+    image: grafana/loki:latest
+    container_name: srv-loki
+    ports:
+      - "3100:3100"
+    environment:
+      TZ: America/Bogota       
+    command: -config.file=/etc/loki/local-config.yaml
+    networks:
+      - ntw_ai
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: srv-grafana
+    ports:
+      - "3001:3000"
+    environment:
+      - TZ=America/Bogota
+      - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
+      - GF_AUTH_ANONYMOUS_ENABLED=true
+      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+      - GF_SECURITY_ADMIN_PASSWORD=${METRICS_GRAFANA_ADMIN_PASSWORD}
+    networks:
+      - ntw_ai
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./configs/grafana/grafana-datasources.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
 
 volumes:
   mysql_data:
@@ -172,7 +271,15 @@ volumes:
     driver: local
   mongo_data:
     driver: local
+  portainer_data:
+  loki_data:
+  grafana_data:
+  vlm_devopsmind_logs:
+    external: true
+  vlm_mcp_server_logs:
+    external: true
 
 networks:
   ntw_ai:
+    name: ntw_ai
     external: true

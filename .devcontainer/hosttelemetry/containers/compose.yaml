@@ -1,6 +1,9 @@
 services:
   hosttelemetry:
     image: mcr.microsoft.com/devcontainers/base:ubuntu26.04
+    hostname: service-hosttelemetry
+    container_name: service-hosttelemetry-container
+    restart: on-failure  
     volumes:
       - ../../..:/workspaces:cached
       - /var/run/docker.sock:/var/run/docker.sock

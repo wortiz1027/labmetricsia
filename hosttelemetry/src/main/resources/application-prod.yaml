@@ -16,3 +16,30 @@ spring:
         streamable-http:
           mcp-endpoint: /mcp
           keep-alive-interval: 30s
+
+management:
+  # 1. Configuración de Métricas (Mapeado bajo Micrometer OTLP)
+  otlp:
+    metrics:
+      export:
+        url: http://${OTLP_METRICS_HOSTNAME:srv-alloy}:${OTLP_METRICS_PORT:4318}/v1/metrics
+        step: 10s
+
+  # 2. Configuración de Trazas y Logs (Mapeado bajo el Starter de OpenTelemetry)
+  opentelemetry:
+    tracing:
+      export:
+        otlp:
+          endpoint: http:///${OTLP_TRACES_HOSTNAME:srv-alloy}:${OTLP_TRACES_PORT:4318}/v1/traces
+    logging:
+      export:
+        otlp:
+          endpoint: http:///${OTLP_LOGS_HOSTNAME:srv-alloy}:${OTLP_LOGS_PORT:4318}/v1/logs
+
+  # 3. Configuración del Motor de Rastreo General
+  tracing:
+    sampling:
+      probability: 1.0
+    propagation:
+      consume: [W3C]
+      produce: [W3C]

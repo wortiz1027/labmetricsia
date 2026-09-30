@@ -5,3 +5,26 @@ spring:
     active: dev # Si no se especifica un perfil al arrancar, usará este
   flyway:
     enabled: false
+
+# ==========================================
+# 🚀 SECCIÓN DE OBSERVABILIDAD CORREGIDA (SPRING BOOT 4)
+# ==========================================
+management:
+  server:
+    port: 9084
+  endpoints:
+    web:
+      exposure:
+        include: prometheus,health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    distribution:
+      percentiles-histogram:
+        http:
+          server:
+            requests: true
+    tags:
+      application: ${spring.application.name}
